@@ -1,3 +1,4 @@
+// chat GTP
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 @Injectable()
