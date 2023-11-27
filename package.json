@@ -1,5 +1,5 @@
 {
-  "name": "tpf-blog",
+  "name": "tpf-blog-back",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -26,6 +26,7 @@
     "@nestjs/mongoose": "^10.0.2",
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
+    "bcrypt": "^5.1.1",
     "mongoose": "^8.0.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
