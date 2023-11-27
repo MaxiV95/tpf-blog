@@ -3,19 +3,34 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
   private users = []; // Debes conectar con tu base de datos MongoDB
 
-  register(createUserDto: CreateUserDto) {
-    // Aquí puedes realizar validaciones, como verificar si el usuario ya existe
+  async register(createUserDto: CreateUserDto) {
+    // Verifica si el usuario ya existe
+    const existingUser = this.users.find(
+      (user) => user.email === createUserDto.email,
+    );
+    if (existingUser) throw new Error('El usuario ya existe');
+
+    // Hashea la contraseña
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    // Crea un nuevo usuario con la contraseña hasheada
     const newUser = {
       id: Date.now().toString(),
       ...createUserDto,
+      password: hashedPassword, // Almacena la contraseña hasheada
     };
+
+    // Agrega el nuevo usuario a la lista de usuarios
     this.users.push(newUser);
+
+    // Retorna el nuevo usuario
     return newUser;
   }
 

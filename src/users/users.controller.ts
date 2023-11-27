@@ -1,26 +1,28 @@
 // users.controller.ts
 import {
   Controller,
+  Body,
+  Param,
   Get,
   Post,
   Put,
   Delete,
-  Param,
-  Body,
-  UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './user.dto';
-import { AuthGuard } from '../auth/auth.guard';
-import { AdminGuard } from '../auth/admin.guard';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.register(createUserDto);
+  @Get(':id')
+  getUser(@Param('id') id: string) {
+    return this.usersService.getUser(id);
+  }
+
+  @Get()
+  listUsers() {
+    return this.usersService.listUsers();
   }
 
   @Post('login')
@@ -28,26 +30,17 @@ export class UsersController {
     return this.usersService.login(loginUserDto);
   }
 
-  @Get()
-  @UseGuards(AdminGuard)
-  listUsers() {
-    return this.usersService.listUsers();
-  }
-
-  @Get(':id')
-  @UseGuards(AuthGuard)
-  getUser(@Param('id') id: string) {
-    return this.usersService.getUser(id);
+  @Post()
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.register(createUserDto);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
   updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  @UseGuards(AdminGuard)
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
   }
