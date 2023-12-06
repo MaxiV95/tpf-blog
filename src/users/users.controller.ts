@@ -7,11 +7,14 @@ import {
   Post,
   Put,
   Delete,
+  UseFilters
 } from '@nestjs/common';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './user.dto';
 import { UsersService } from './users.service';
+import { ErrorFilter } from 'src/errorExceptionFilters';
 
 @Controller('users')
+@UseFilters(ErrorFilter)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -21,8 +24,8 @@ export class UsersController {
   }
 
   @Get() // admin
-  listUsers() {
-    return this.usersService.listUsers();
+  getAllUsers() {
+    return this.usersService.getAllUsers();
   }
 
   @Post('login') // auth

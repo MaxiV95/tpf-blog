@@ -1,8 +1,9 @@
 export interface User {
   id: number;
   email: string;
-  name?: string;
   password?: string;
+  nickName?: string;
+  img?: string;
 }
 
 export interface JwtUser {
@@ -15,6 +16,8 @@ export interface JwtUser {
 export class CreateUserDto {
   readonly email: string;
   readonly password: string;
+  readonly nickName: string;
+  readonly img: string;
 }
 
 export class LoginUserDto {
@@ -24,5 +27,7 @@ export class LoginUserDto {
 
 export class UpdateUserDto {
   readonly id: number;
-  readonly name: string;
+  readonly email: string;
+  readonly nickName: string;
+  readonly img: string;
 }

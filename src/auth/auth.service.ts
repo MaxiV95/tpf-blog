@@ -11,7 +11,6 @@ export class AuthService {
       id: 1,
       email: 'maxi@gmail.com',
       password: 'test',
-      name: 'Maxi',
     };
   }
 
