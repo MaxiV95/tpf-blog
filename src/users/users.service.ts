@@ -1,76 +1,59 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from './user.schema';
+import { CustomError } from 'src/errorExceptionFilters';
 
 @Injectable()
 export class UsersService {
-  private users = []; // Debes conectar con tu base de datos MongoDB
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async register(createUserDto: CreateUserDto) {
-    // Verifica si el usuario ya existe
-    const existingUser = this.users.find(
-      (user) => user.email === createUserDto.email,
-    );
-    if (existingUser) throw new Error('El usuario ya existe');
+    if (
+      !createUserDto.email ||
+      !createUserDto.password ||
+      !createUserDto.nickName
+    )
+      throw new CustomError(
+        'Email, password and nickname is required',
+        400,
+        'InvalidInputError',
+      );
 
-    // Hashea la contraseña
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    // Crea un nuevo usuario con la contraseña hasheada
-    const newUser = {
-      id: Date.now().toString(),
-      ...createUserDto,
-      password: hashedPassword, // Almacena la contraseña hasheada
-    };
-
-    // Agrega el nuevo usuario a la lista de usuarios
-    this.users.push(newUser);
-
-    // Retorna el nuevo usuario
-    return newUser;
+    return (await this.userModel
+      .create({ ...createUserDto, password: hashedPassword }))
+      .toJSON();
   }
 
-  login(loginUserDto: LoginUserDto) {
-    const user = this.users.find(
-      (u) =>
-        u.email === loginUserDto.email && u.password === loginUserDto.password,
-    );
+  async login(loginUserDto: LoginUserDto) {
+    if (!loginUserDto.password)
+      throw new CustomError('Password is required', 400, 'InvalidInputError');
 
-    if (!user) {
+    const user = await this.userModel.findOne({ email: loginUserDto.email });
+
+    if (!user || !(await bcrypt.compare(loginUserDto.password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
-    }
 
-    return user;
+    return user.toJSON();
   }
 
-  listUsers() {
-    return this.users;
+  async getAllUsers(): Promise<User[]> {
+    return this.userModel.find().select('-password').lean();
   }
 
-  getUser(id: string) {
-    const user = this.users.find((u) => u.id === id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
+  async getUser(id: string): Promise<User> {
+    return (await this.userModel.findById(id)).toJSON(); // or findOne({ uid: id })
   }
 
-  updateUser(id: string, updateUserDto: UpdateUserDto) {
-    const user = this.getUser(id);
-    // Aquí puedes implementar la lógica de actualización
-    Object.assign(user, updateUserDto);
-    return user;
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    return this.userModel.updateOne({ _id: id }, updateUserDto).lean();
   }
 
-  deleteUser(id: string) {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    this.users.splice(index, 1);
+  async deleteUser(id: string): Promise<User> {
+    return this.userModel.deleteOne({ _id: id }).lean();
   }
 }
