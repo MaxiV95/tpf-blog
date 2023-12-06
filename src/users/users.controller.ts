@@ -15,17 +15,17 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
+  @Get(':id') // login
   getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }
 
-  @Get()
+  @Get() // admin
   listUsers() {
     return this.usersService.listUsers();
   }
 
-  @Post('login')
+  @Post('login') // auth
   login(@Body() loginUserDto: LoginUserDto) {
     return this.usersService.login(loginUserDto);
   }
@@ -35,12 +35,12 @@ export class UsersController {
     return this.usersService.register(createUserDto);
   }
 
-  @Put(':id')
+  @Put(':id') // login o admin
   updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(':id') // admin
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
   }

@@ -15,7 +15,7 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    throw new EjemploHttpException('mi app fallo :(');
+    throw new EjemploHttpException('mi app fallo :( No autorizado');
     return this.appService.getHello();
   }
 }

@@ -28,6 +28,14 @@ export class PostsService {
     return post;
   }
 
+  getPostUser(idUser: string) {
+    const posts = this.posts.find((p) => p.user === idUser);
+    if (!posts) {
+      throw new NotFoundException(`Posts with IDUser ${idUser} not found`);
+    }
+    return posts;
+  }
+
   updatePost(id: string, updatePostDto: UpdatePostDto) {
     const post = this.getPost(id);
     // Aquí puedes implementar la lógica de actualización
