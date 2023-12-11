@@ -46,14 +46,14 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    return (await this.userModel.findById(id)).toJSON(); // or findOne({ uid: id })
+    return this.userModel.findById(id).select('-password').lean(); // or findOne({ uid: id })
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    return this.userModel.updateOne({ _id: id }, updateUserDto).lean();
+    return this.userModel.updateOne({ _id: id }, updateUserDto).select('-password').lean();
   }
 
   async deleteUser(id: string): Promise<User> {
-    return this.userModel.deleteOne({ _id: id }).lean();
+    return this.userModel.deleteOne({ _id: id }).select('-password').lean();
   }
 }
