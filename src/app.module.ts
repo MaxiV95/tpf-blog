@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
+import { ChatModule } from './chat/chat.module';
 
 import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
@@ -13,10 +16,12 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/blog'),
     AuthModule,
+    ChatModule,
+    MongooseModule.forRoot('mongodb://localhost:27017/blog'),
     PostsModule,
     ProductsModule,
+    ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
     UsersModule,
   ],
   controllers: [AppController, AuthController],

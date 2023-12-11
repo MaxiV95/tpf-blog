@@ -4,6 +4,7 @@
     "hasheada",
     "maxlength",
     "nestjs",
-    "paginación"
+    "paginación",
+    "websockets"
   ]
 }
