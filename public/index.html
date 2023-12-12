@@ -20,8 +20,8 @@
   <script>
     const form = document.querySelector('.form');
     const input = document.querySelector('input');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
       const name = input.value;
       if (name) {
         localStorage.setItem('name', name);

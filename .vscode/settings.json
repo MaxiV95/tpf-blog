@@ -5,6 +5,7 @@
     "maxlength",
     "nestjs",
     "paginación",
+    "renderiza",
     "websockets"
   ]
 }

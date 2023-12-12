@@ -18,30 +18,27 @@ export class ChatGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket: Socket) => {
-      // Al conectar un cliente 
+      // Al conectar un cliente
 
       const {
-        //token,
+        token,
         name,
-        email = 'fernando@google.com',
+        //email = 'maxi@google.com',
       } = socket.handshake.auth;
 
       if (!name) {
+        // verificaciones para rechazar connection
         socket.disconnect();
         return;
       }
+      console.log('Cliente conectado', name, token, socket.id);
+      socket.emit('welcome-message', 'Bienvenido a nuestro chat');
 
       this.chatService.onClientConnected({ id: socket.id, name: name });
-
-      // console.log('Cliente conectado', socket.id );
-      socket.join(email);
-      // socket.emit('welcome-message', 'Bienvenido a nuestro chat');
-
       this.server.emit('on-clients-changed', this.chatService.getClients());
+      socket.join('private-room'); // Unirse a la sala privada
 
       socket.on('disconnect', () => {
-        // AL desconectar
-        // console.log('Cliente desconectado', socket.id );
         this.chatService.onClientDisconnected(socket.id);
         this.server.emit('on-clients-changed', this.chatService.getClients());
       });
@@ -53,17 +50,29 @@ export class ChatGateway implements OnModuleInit {
     @MessageBody() message: string,
     @ConnectedSocket() client: Socket,
   ) {
+    if (!message) return;
+    const { name } = client.handshake.auth;
+    this.server.emit('on-message', {
+      userId: client.id,
+      message: message,
+      name: name,
+    });
+  }
+
+  @SubscribeMessage('send-private-message')
+  handlePrivateMessage(
+    @MessageBody() message: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!message) return;
     const { name } = client.handshake.auth;
 
-    if (!message) {
-      return;
-    }
+    this.server.to('private-room').emit('on-private-message', {
+      userId: client.id,
+      message: 'este es un mensaje privado',
+    });
 
-    this.server
-      .to('fernando@google.com')
-      .emit('on-message', 'Este es un mensaje privado');
-
-    this.server.emit('on-message', {
+    this.server.to('private-room').emit('on-private-message', {
       userId: client.id,
       message: message,
       name: name,
