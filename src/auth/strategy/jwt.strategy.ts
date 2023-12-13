@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: '$P4L4bR45Up3RS3CR3T4%',
+      secretOrKey: '$P4L4bR45Up3RS3CR3T4%', //dotenv
     });
   }
 

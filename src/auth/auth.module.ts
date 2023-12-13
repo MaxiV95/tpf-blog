@@ -10,7 +10,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: '$P4L4bR45Up3RS3CR3T4%',
+      secret: '$P4L4bR45Up3RS3CR3T4%', //dotenv
       signOptions: { expiresIn: '120s' },
     }),
   ],

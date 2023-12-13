@@ -6,6 +6,8 @@
     "nestjs",
     "paginación",
     "renderiza",
+    "signoff",
+    "smee",
     "websockets"
   ]
 }
