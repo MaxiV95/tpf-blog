@@ -1,5 +1,4 @@
 import { Controller, Get, Inject, UseInterceptors } from '@nestjs/common';
-import { NewsService } from './news.service';
 import {
   CACHE_MANAGER,
   CacheInterceptor,
@@ -7,6 +6,7 @@ import {
   CacheTTL,
 } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { NewsService } from './news.service';
 
 @Controller('/news')
 export class NewsController {
@@ -15,17 +15,19 @@ export class NewsController {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
+  // Gestor manual de cache
   @Get()
   async news() {
     const cachedNews = await this.cacheManager.get('news');
     if (!cachedNews) {
       const { data } = await this.newsService.getNews();
-      await this.cacheManager.set('news', data, 0);
+      await this.cacheManager.set('news', data, 0); //0 no expira, tiempo en ms
       return data;
     }
     return cachedNews;
   }
 
+  // Automático con decorador
   @UseInterceptors(CacheInterceptor)
   @CacheKey('more')
   @CacheTTL(0)
