@@ -13,7 +13,6 @@ import { ChatModule } from './chat/chat.module';
 import { GithubModule } from './github/github.module';
 import { NewsModule } from './news/news.module';
 import { PostsModule } from './posts/posts.module';
-import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
 import { AppController } from './app.controller';
@@ -40,7 +39,6 @@ import { DiscordService } from './github/discord.service';
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/blog'),
     NewsModule,
     PostsModule,
-    ProductsModule,
     ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
     UsersModule,
   ],
