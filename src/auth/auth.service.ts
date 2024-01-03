@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/users/user.dto';
+import { UserDto } from 'src/users/user.dto';
 
 @Injectable()
 export class AuthService {
-  testUser: User;
+  testUser: UserDto;
 
   constructor(private jwtService: JwtService) {
     this.testUser = {
-      id: 1,
+      id: '1a',
       email: 'maxi@gmail.com',
       password: 'test',
     };
@@ -16,7 +16,7 @@ export class AuthService {
 
   // ACA TRAEMOS AL USUARIO DE MONGO
 
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(email: string, password: string): Promise<UserDto> {
     if (this.testUser?.email == email && this.testUser?.password === password) {
       return {
         id: this.testUser.id,
@@ -26,8 +26,8 @@ export class AuthService {
     return null;
   }
 
-  login(user: User) {
-    const payload: User = {
+  login(user: UserDto) {
+    const payload: UserDto = {
       id: user.id,
       email: user.email,
     };

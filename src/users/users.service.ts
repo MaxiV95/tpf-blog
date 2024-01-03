@@ -1,35 +1,28 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from './user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import bcrypt from 'bcrypt';
 import { User } from './user.schema';
 import { CustomError } from 'src/errorExceptionFilters';
+import { UserCreateDto, UserLoginDto, UserUpdateDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async register(createUserDto: CreateUserDto) {
-    if (
-      !createUserDto.email ||
-      !createUserDto.password ||
-      !createUserDto.nickName
-    )
-      throw new CustomError(
-        'Email, password and nickname is required',
-        400,
-        'InvalidInputError',
-      );
-
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    return (await this.userModel
-      .create({ ...createUserDto, password: hashedPassword }))
-      .toJSON();
+  async deleteUser(id: string): Promise<User> {
+    return this.userModel.deleteOne({ _id: id }).select('-password').lean();
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async getAllUsers(): Promise<User[]> {
+    return this.userModel.find().select('-password').lean();
+  }
+
+  async getUser(id: string): Promise<User> {
+    return this.userModel.findById(id).select('-password').lean(); // or findOne({ uid: id })
+  }
+
+  async login(loginUserDto: UserLoginDto): Promise<User> {
     if (!loginUserDto.password)
       throw new CustomError('Password is required', 400, 'InvalidInputError');
 
@@ -41,19 +34,31 @@ export class UsersService {
     return user.toJSON();
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return this.userModel.find().select('-password').lean();
+  async register(newUser: UserCreateDto): Promise<User> {
+    if (!newUser.email || !newUser.password || !newUser.nickName)
+      throw new CustomError(
+        'Email, password and nickname is required',
+        400,
+        'InvalidInputError',
+      );
+
+    const hashedPassword = await bcrypt.hash(newUser.password, 10);
+
+    return (
+      await this.userModel.create({ ...newUser, password: hashedPassword })
+    ).toJSON();
   }
 
-  async getUser(id: string): Promise<User> {
-    return this.userModel.findById(id).select('-password').lean(); // or findOne({ uid: id })
-  }
+  async updateUser(id: string, dataUser: UserUpdateDto): Promise<User> {
+    const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    return this.userModel.updateOne({ _id: id }, updateUserDto).select('-password').lean();
-  }
+    if (dataUser.nickName !== undefined) updateFields.nickName = dataUser.nickName;
 
-  async deleteUser(id: string): Promise<User> {
-    return this.userModel.deleteOne({ _id: id }).select('-password').lean();
+    if (dataUser.img !== undefined) updateFields.img = dataUser.img;
+
+    return this.userModel
+      .updateOne({ _id: id }, { $set: updateFields })
+      .select('-password')
+      .lean();
   }
 }
