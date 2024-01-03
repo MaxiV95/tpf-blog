@@ -1,53 +1,54 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePostDto, UpdatePostDto } from './post.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Post } from './post.schema';
+import { PostDto } from './post.dto';
+import { CustomError } from 'src/errorExceptionFilters';
 
 @Injectable()
 export class PostsService {
-  private posts = []; // Debes conectar con tu base de datos MongoDB
+  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
-  createPost(createPostDto: CreatePostDto) {
-    // Aquí puedes realizar validaciones y crear un nuevo post
-    const newPost = {
-      id: Date.now().toString(),
-      ...createPostDto,
-    };
-    this.posts.push(newPost);
-    return newPost;
+  async createPost(newPost: PostDto): Promise<Post> {
+    if (!newPost.title || !newPost.content || !newPost.idAuthor)
+      throw new CustomError(
+        'Title, content and idAuthor is required',
+        400,
+        'InvalidInputError',
+      );
+
+    return await this.postModel.create(newPost);
   }
 
-  listPosts() {
-    // Aquí puedes implementar la lógica de paginación y filtrado de posts
-    return this.posts;
+  async deletePost(id: string): Promise<Post> {
+    return this.postModel.deleteOne({ _id: id }).lean();
   }
 
-  getPost(id: string) {
-    const post = this.posts.find((p) => p.id === id);
-    if (!post) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
-    }
-    return post;
+  async getPost(id: string): Promise<Post> {
+    return this.postModel.findById(id).lean();
   }
 
-  getPostUser(idUser: string) {
-    const posts = this.posts.find((p) => p.user === idUser);
-    if (!posts) {
+  async getPostUser(idUser: string): Promise<Post[]> {
+    const posts = this.postModel.find({ idAuthor: idUser }).lean();
+
+    if (!posts)
       throw new NotFoundException(`Posts with IDUser ${idUser} not found`);
-    }
+
     return posts;
   }
 
-  updatePost(id: string, updatePostDto: UpdatePostDto) {
-    const post = this.getPost(id);
-    // Aquí puedes implementar la lógica de actualización
-    Object.assign(post, updatePostDto);
-    return post;
+  async listPosts() {
+    // Aquí puedes implementar la lógica de paginación y filtrado de posts
+    return;
   }
 
-  deletePost(id: string) {
-    const index = this.posts.findIndex((p) => p.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
-    }
-    this.posts.splice(index, 1);
+  async updatePost(id: string, updatePost: PostDto): Promise<Post> {
+    const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
+
+    if (updatePost.title !== undefined) updateFields.title = updatePost.title;
+
+    if (updatePost.content !== undefined) updateFields.img = updatePost.content;
+
+    return this.postModel.updateOne({ _id: id }, { $set: updateFields }).lean();
   }
 }

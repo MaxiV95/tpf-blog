@@ -21,7 +21,7 @@ export class Post {
     required: true,
     unique: true,
   })
-  author: mongoose.Types.ObjectId;
+  idAuthor: mongoose.Types.ObjectId;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
