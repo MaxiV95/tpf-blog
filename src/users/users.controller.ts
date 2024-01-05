@@ -35,7 +35,7 @@ export class UsersController {
   })
   @UseGuards(JwtAuthGuard)
   getUser(@Param('id') id: string, @Request() { user }) {
-    if (!user.admin && id !== user.id) 
+    if (!user.admin && id !== user.id)
       throw new UnauthorizedException('Unauthorized admin access');
     return this.usersService.getUser(id);
   }
@@ -76,7 +76,7 @@ export class UsersController {
     type: UserDB,
   })
   register(@Body() createUser: UserCreateDto) {
-    return this.usersService.register(createUser);
+    return this.usersService.registerUser(createUser);
   }
 
   @Post('login')

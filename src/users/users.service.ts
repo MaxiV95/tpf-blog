@@ -2,7 +2,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { User } from './user.schema';
 import { CustomError } from 'src/errorExceptionFilters';
 import { UserCreateDto, UserLoginDto, UserUpdateDto } from './user.dto';
@@ -20,7 +20,7 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    const user = await this.userModel.findById(id)
+    const user = await this.userModel.findById(id);
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
     return user.toJSON();
   }
@@ -37,18 +37,23 @@ export class UsersService {
     return user.toJSON();
   }
 
-  async register(newUser: UserCreateDto): Promise<User> {
-    if (!newUser.email || !newUser.password || !newUser.nickName)
+  async registerUser(userCreate: UserCreateDto): Promise<User> {
+    if (!userCreate.email || !userCreate.password || !userCreate.nickName)
       throw new CustomError(
         'Email, password and nickname is required',
         400,
         'InvalidInputError',
       );
 
-    const hashedPassword = await bcrypt.hash(newUser.password, 10);
+    const hashedPassword = await bcrypt.hash(userCreate.password, 10);
 
     return (
-      await this.userModel.create({ ...newUser, password: hashedPassword })
+      await this.userModel.create({
+        email: userCreate.email,
+        password: hashedPassword,
+        nickName: userCreate.nickName,
+        img: userCreate.img,
+      })
     ).toJSON();
   }
 
