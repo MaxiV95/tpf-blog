@@ -1,7 +1,8 @@
+//jwt.strategy.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserJWT, UserDto } from 'src/users/user.dto';
+import { UserJWT, UserAuthDto } from 'src/users/user.dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -9,12 +10,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: '$P4L4bR45Up3RS3CR3T4%', //dotenv
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
-  validate(payload: UserJWT): UserDto{
-    if (!payload) throw new UnauthorizedException();
-    return { id: payload.id, email: payload.email };
+  validate(payload: UserJWT): UserAuthDto {
+    if (!payload) throw new UnauthorizedException('access_token is required');
+    return payload
+    //return { id: payload.id, email: payload.email };
   }
 }
