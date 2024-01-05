@@ -5,9 +5,11 @@ import {
   CacheKey,
   CacheTTL,
 } from '@nestjs/cache-manager';
+import { ApiTags } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
 import { NewsService } from './news.service';
 
+@ApiTags('More')
 @Controller('/news')
 export class NewsController {
   constructor(

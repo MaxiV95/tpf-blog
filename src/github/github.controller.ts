@@ -2,10 +2,12 @@
 // https://smee.io/
 // smee --url https://smee.io/JTaHDEnckkZwVfty --target http://localhost:3001/github
 import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { GithubService } from './github.service';
 import { GitHubEvent, GitHubPayload } from './github.interface';
 import { GithubGuard } from './github.guard';
 
+@ApiTags('More')
 @Controller('github')
 export class GithubController {
   constructor(private readonly githubService: GithubService) {}
@@ -23,4 +25,3 @@ export class GithubController {
     return { githubEvent };
   }
 }
-

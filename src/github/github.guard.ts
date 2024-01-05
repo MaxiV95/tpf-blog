@@ -4,7 +4,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import type { Request } from 'express';
 
-const WEBHOOK_SECRET = '$P4L4bR45Up3RS3CR3T4%'; //dotenv
+const WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET;
 
 @Injectable()
 export class GithubGuard implements CanActivate {

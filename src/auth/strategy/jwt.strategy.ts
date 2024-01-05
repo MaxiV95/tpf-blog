@@ -17,6 +17,5 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   validate(payload: UserJWT): UserAuthDto {
     if (!payload) throw new UnauthorizedException('access_token is required');
     return payload
-    //return { id: payload.id, email: payload.email };
   }
 }
