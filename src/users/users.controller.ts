@@ -8,9 +8,10 @@ import {
   Put,
   Delete,
   UseFilters,
+  UseGuards,
+  Request
 } from '@nestjs/common';
 import {
-  UserJWT,
   UserCreateDto,
   UserLoginDto,
   UserUpdateDto,
@@ -19,6 +20,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { ErrorFilter } from 'src/errorExceptionFilters';
+import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -76,18 +78,18 @@ export class UsersController {
     return this.usersService.register(createUser);
   }
 
-  @Post('login') // auth
+  @Post('login')
   @ApiOperation({ summary: 'Obtener token JWT' })
   @ApiResponse({
     status: 201,
     description: 'Retorna JWT para siguientes consultas.',
-    type: UserJWT,
   })
   @ApiResponse({
     status: 401,
     description: 'email o password incorrecto.',
   })
-  login(@Body() loginUser: UserLoginDto) {
-    return this.usersService.login(loginUser);
+  @UseGuards(LocalAuthGuard)
+  login(@Body() loginUser: UserLoginDto, @Request() { user }) {
+    return { access_token: user.access_token };
   }
 }

@@ -1,12 +1,12 @@
+//app.module.ts
 import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 // import type { RedisClientOptions } from 'redis';
 // import { redisStore } from 'cache-manager-redis-yet';
-import { join } from 'path';
-import config from './config';
 
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
@@ -15,10 +15,6 @@ import { NewsModule } from './news/news.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 
-import { AppController } from './app.controller';
-import { AuthController } from './auth/auth.controller';
-
-import { AppService } from './app.service';
 import { DiscordService } from './github/discord.service';
 
 @Module({
@@ -34,7 +30,7 @@ import { DiscordService } from './github/discord.service';
         port: parseInt(process.env.REDIS_PORT) || 6379,
       },
      }), */
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    ConfigModule.forRoot({ isGlobal: true, load: [] }),
     GithubModule,
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/blog'),
     NewsModule,
@@ -42,7 +38,6 @@ import { DiscordService } from './github/discord.service';
     ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
     UsersModule,
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, DiscordService],
+  providers: [DiscordService],
 })
 export class AppModule {}
