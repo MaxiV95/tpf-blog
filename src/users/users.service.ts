@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+//users.service.ts
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import bcrypt from 'bcrypt';
@@ -19,7 +20,9 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    return this.userModel.findById(id).select('-password').lean(); // or findOne({ uid: id })
+    const user = await this.userModel.findById(id)
+    if (!user) throw new NotFoundException(`User with id ${id} not found`);
+    return user.toJSON();
   }
 
   async login(loginUserDto: UserLoginDto): Promise<User> {

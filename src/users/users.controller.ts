@@ -1,26 +1,23 @@
 // users.controller.ts
 import {
-  Controller,
   Body,
-  Param,
+  Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Put,
-  Delete,
+  Request,
+  UnauthorizedException,
   UseFilters,
   UseGuards,
-  Request
 } from '@nestjs/common';
-import {
-  UserCreateDto,
-  UserLoginDto,
-  UserUpdateDto,
-  UserDB,
-} from './user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserCreateDto, UserLoginDto, UserUpdateDto, UserDB } from './user.dto';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { ErrorFilter } from 'src/errorExceptionFilters';
 import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
+import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
+import { ErrorFilter } from 'src/errorExceptionFilters';
 
 @ApiTags('Users')
 @Controller('users')
@@ -29,13 +26,17 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id') // login
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener usuario' })
   @ApiResponse({
     status: 200,
     description: 'Retorna los datos del usuario.',
     type: UserDB,
   })
-  getUser(@Param('id') id: string) {
+  @UseGuards(JwtAuthGuard)
+  getUser(@Param('id') id: string, @Request() { user }) {
+    if (!user.admin && id !== user.id) 
+      throw new UnauthorizedException('Unauthorized admin access');
     return this.usersService.getUser(id);
   }
 

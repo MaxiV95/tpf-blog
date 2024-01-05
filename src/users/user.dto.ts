@@ -1,11 +1,30 @@
+//user.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 
-export interface UserDto {
+/**
+ * @prop {string} id - Identificador único del usuario.
+ * @prop {string} email - Correo electrónico del usuario.
+ * @prop {string} nickName - Nombre de usuario del usuario.
+ * @prop {boolean} admin - Indica si el usuario es administrador.
+ */
+export interface UserAuthDto {
   readonly id: string;
   readonly email: string;
-  readonly password?: string;
-  readonly nickName?: string;
-  readonly img?: string;
+  readonly nickName: string;
+  readonly admin: boolean;
+}
+
+/**
+ * @prop {number} iat - Tiempo de emisión del token JWT.
+ * @prop {number} exp - Tiempo de expiración del token JWT.
+ * @prop {string} id - Identificador único del usuario.
+ * @prop {string} email - Correo electrónico del usuario.
+ * @prop {string} nickName - Nombre de usuario del usuario.
+ * @prop {boolean} admin - Indica si el usuario es administrador.
+ */
+export interface UserJWT extends UserAuthDto {
+  readonly iat: number;
+  readonly exp: number;
 }
 
 const idProperty: Record<string, string> = {
@@ -29,6 +48,12 @@ const imgProperty: Record<string, string> = {
   example: 'https://avatars.githubusercontent.com/u/118027004',
 };
 
+/**
+ * @property {string} email - Correo electrónico del usuario.
+ * @property {string} password - Contraseña del usuario.
+ * @property {string} nickName - Nombre del usuario.
+ * @property {string} img - Enlace de la imagen del usuario (opcional).
+ */
 export class UserCreateDto {
   @ApiProperty(emailProperty)
   readonly email: string;
@@ -37,9 +62,13 @@ export class UserCreateDto {
   @ApiProperty(nickNameProperty)
   readonly nickName: string;
   @ApiProperty(imgProperty)
-  readonly img: string;
+  readonly img?: string;
 }
 
+/**
+ * @property {string} email - Correo electrónico del usuario.
+ * @property {string} password - Contraseña del usuario.
+ */
 export class UserLoginDto {
   @ApiProperty(emailProperty)
   readonly email: string;
@@ -47,31 +76,36 @@ export class UserLoginDto {
   readonly password: string;
 }
 
+/**
+ * @property {string} nickName - Nuevo nombre de usuario (opcional).
+ * @property {string} img - Nuevo enlace de la imagen del usuario (opcional).
+ * @property {boolean} admin - Nuevo status (solo admins).
+ */
 export class UserUpdateDto {
   @ApiProperty(nickNameProperty)
-  readonly nickName: string;
+  readonly nickName?: string;
   @ApiProperty(imgProperty)
-  readonly img: string;
+  readonly img?: string;
+  @ApiProperty(imgProperty)
+  readonly admin?: boolean;
 }
 
+/**
+ * @property {string} id - Identificador único del usuario.
+ * @property {string} email - Correo electrónico del usuario.
+ * @property {string} nickName - Nombre del usuario.
+ * @property {boolean} admin - Indica si el usuario es administrador.
+ * @property {string} img - Enlace de la imagen del usuario.
+ */
 export class UserDB {
-  @ApiProperty(idProperty)
-  readonly _id: string;
-  @ApiProperty(emailProperty)
-  readonly email: string;
-  @ApiProperty(nickNameProperty)
-  readonly nickName: string;
-  @ApiProperty(imgProperty)
-  readonly img: string;
-}
-
-export class UserJWT {
   @ApiProperty(idProperty)
   readonly id: string;
   @ApiProperty(emailProperty)
   readonly email: string;
-  @ApiProperty({ description: 'Tiempo de Emisión.', example: '123123' })
-  readonly iat: any;
-  @ApiProperty({ description: 'Tiempo de Expiración.', example: '123123' })
-  readonly exp: any;
+  @ApiProperty(nickNameProperty)
+  readonly nickName: string;
+  @ApiProperty({ description: 'Status.', example: false })
+  readonly admin: boolean;
+  @ApiProperty(imgProperty)
+  readonly img: string;
 }
