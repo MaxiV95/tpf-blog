@@ -6,7 +6,7 @@ Este es un proyecto de ejemplo que utiliza Nest.js para crear una aplicación de
 Considerando la utilización de MongoDB y un middleware de autorización para usuarios administradores, los endpoints podrían quedar de la siguiente manera:
 
 ### **Usuarios**
-- **`POST /users`** - Registro de nuevos usuarios.
+- **`POST /users`** - Registro de nuevos usuarios. Cada usuario debe tener nombre de usuario, contraseña, y un booleano isAdmin.
 - **`POST /users/login`** - Inicio de sesión para usuarios.
 - **`GET /users`** - Listado de usuarios (restringido a administradores).
 - **`GET /users/{:id}`** - Obtener detalles de un usuario específico.
@@ -14,8 +14,8 @@ Considerando la utilización de MongoDB y un middleware de autorización para us
 - **`DELETE /users/{:id}`** - Eliminar un usuario (solo administradores).
 
 ### **Posts**
-- **`POST /posts`** - Crear un nuevo post (solo usuarios registrados). Los post tendrán id, título, autor, contenido y un array de categorías
-- **`GET /posts`** - Listado de todos los posts. Debe admitir parámetros para paginar resultados (el default de resultados si no hay param será 10)
+- **`POST /posts`** - Crear un nuevo post (solo usuarios registrados). Los post tendrán id, título, autor, contenido y un array de categorías.
+- **`GET /posts`** - Listado de todos los posts. Debe admitir parámetros para paginar resultados (el default de resultados si no hay param será 10).
 - **`GET /posts/{:id}`** - Ver detalles de un post específico.
 - **`PUT /posts/{:id}`** - Actualizar un post (solo el autor o administradores).
 - **`DELETE /posts/{:id}`** - Eliminar un post (solo el autor o administradores).
@@ -64,7 +64,7 @@ npm install
 MONGODB_URI=your_mongodb_uri
 ```
 
-5. Inicia la aplicación:
+5. Inicia la aplicación:s
 ```bash
 npm start
 ```
