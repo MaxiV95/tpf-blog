@@ -1,3 +1,4 @@
+//user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
@@ -22,6 +23,9 @@ export class User {
   @Prop({ type: String, required: true, unique: true })
   nickName: string;
 
+  @Prop({ type: Boolean, default: false })
+  admin: boolean;
+
   @Prop({ type: String, default: null })
   img: string;
 }
@@ -29,7 +33,12 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.toJSON = function () {
-  const user = this.toObject();
-  delete user.password;
-  return user;
+  return this.toObject({
+    transform: (doc: any, ret: Record<string, any>) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      delete ret.password;
+    },
+  });
 };
