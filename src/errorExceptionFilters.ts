@@ -1,3 +1,4 @@
+//errorExceptionFilters.ts
 import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -15,6 +16,9 @@ export class CustomError extends Error {
 const ERROR_HANDLERS = {
   BadRequestException: (res: any, err: Error) => {
     res.status(400).json({ name: err.name, message: err.message }).end();
+  },
+  NotFoundException: (res: any, err: Error) => {
+    res.status(404).json({ name: err.name, message: err.message }).end();
   },
   UnauthorizedException: (res: any, err: Error) => {
     res.status(401).json({ name: err.name, message: err.message }).end();
