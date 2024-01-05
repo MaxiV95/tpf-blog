@@ -4,7 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
-const PORT = process.env.PORT; //|| 3001;
+const PORT = process.env.PORT || 3001;
 
 async function bootstrap() {
   try {
