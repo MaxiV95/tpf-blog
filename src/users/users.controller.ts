@@ -7,17 +7,28 @@ import {
   Param,
   Post,
   Put,
-  Request,
   UnauthorizedException,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { UserCreateDto, UserLoginDto, UserUpdateDto, UserDB } from './user.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  UserCreateDto,
+  UserLoginDto,
+  UserUpdateDto,
+  UserDB,
+  UserJWT,
+} from './user.dto';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
 import { ErrorFilter } from 'src/errorExceptionFilters';
+import { User } from 'src/decorators/custom.decorator.ts';
 
 @ApiTags('Users')
 @Controller('users')
@@ -34,7 +45,7 @@ export class UsersController {
     type: UserDB,
   })
   @UseGuards(JwtAuthGuard)
-  getUser(@Param('id') id: string, @Request() { user }) {
+  getUser(@Param('id') id: string, @User() user: UserJWT) {
     if (!user.admin && id !== user.id)
       throw new UnauthorizedException('Unauthorized admin access');
     return this.usersService.getUser(id);
@@ -90,7 +101,7 @@ export class UsersController {
     description: 'email o password incorrecto.',
   })
   @UseGuards(LocalAuthGuard)
-  login(@Body() loginUser: UserLoginDto, @Request() { user }) {
+  login(@Body() loginUser: UserLoginDto, @User() user: any) {
     return { access_token: user.access_token };
   }
 }
