@@ -20,10 +20,10 @@ import {
 import { UsersService } from './users.service';
 import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
-import { LimitedUserGuard } from 'src/decorators/limitedUser.guard';
-import { adminGuard } from 'src/decorators/admin.guard';
+import { LimitedUserGuard } from 'src/auth/guard/limitedUser.guard';
+import { adminGuard } from 'src/auth/guard/admin.guard';
 import { ErrorFilter } from 'src/errorExceptionFilters';
-import { User } from 'src/decorators/custom.decorator.ts';
+import { User } from 'src/auth/custom.decorator.ts';
 
 @ApiTags('Users')
 @Controller('users')
