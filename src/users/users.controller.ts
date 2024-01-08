@@ -7,17 +7,10 @@ import {
   Param,
   Post,
   Put,
-  UnauthorizedException,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import {
-  UserCreateDto,
-  UserLoginDto,
-  UserUpdateDto,
-  UserDB,
-  UserJWT,
-} from './user.dto';
+import { UserCreateDto, UserLoginDto, UserUpdateDto, UserDB } from './user.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -27,6 +20,8 @@ import {
 import { UsersService } from './users.service';
 import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
+import { LimitedUserGuard } from 'src/decorators/limitedUser.guard';
+import { adminGuard } from 'src/decorators/admin.guard';
 import { ErrorFilter } from 'src/errorExceptionFilters';
 import { User } from 'src/decorators/custom.decorator.ts';
 
@@ -36,7 +31,7 @@ import { User } from 'src/decorators/custom.decorator.ts';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id') // login
+  @Get(':id') // user o admin
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener usuario' })
   @ApiResponse({
@@ -44,37 +39,54 @@ export class UsersController {
     description: 'Retorna los datos del usuario.',
     type: UserDB,
   })
-  @UseGuards(JwtAuthGuard)
-  getUser(@Param('id') id: string, @User() user: UserJWT) {
-    if (!user.admin && id !== user.id)
-      throw new UnauthorizedException('Unauthorized admin access');
+  @UseGuards(JwtAuthGuard, LimitedUserGuard)
+  getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }
 
-  @Put(':id') // login o admin
+  @Put(':id') // user o admin
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Modificar usuario' })
   @ApiResponse({
     status: 200,
     description: 'Retorna los datos del usuario.',
     type: UserDB,
   })
+  @UseGuards(JwtAuthGuard, LimitedUserGuard)
   updateUser(@Param('id') id: string, @Body() updateUser: UserUpdateDto) {
     return this.usersService.updateUser(id, updateUser);
   }
 
   @Delete(':id') // admin
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ADMIN Eliminar usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Confirma usuario eliminado.',
+    schema: {
+      properties: {
+        acknowledged: { type: 'boolean' },
+        deletedCount: { type: 'number' },
+      },
+      example: {
+        acknowledged: true,
+        deletedCount: 1,
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard, adminGuard)
   deleteUser(@Param('id') id: string) {
     return this.usersService.deleteUser(id);
   }
-
   @Get() // admin
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
   @ApiResponse({
     status: 201,
     description: 'Retorna los datos del usuario creado.',
     type: [UserDB],
   })
+  @UseGuards(JwtAuthGuard, adminGuard)
   getAllUsers() {
     return this.usersService.getAllUsers();
   }
