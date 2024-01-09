@@ -28,11 +28,6 @@ export class PostDto {
   readonly content: string;
   @ApiProperty(categoriesProperty)
   readonly categories?: string[];
-  @ApiProperty({
-    description: 'ID del Usuario que lo creo.',
-    example: '6570bb7db2ad523394706c12',
-  })
-  readonly idAuthor: string;
 }
 
 export class PostDB {
