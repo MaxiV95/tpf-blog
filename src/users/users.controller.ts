@@ -49,7 +49,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Modificar usuario' })
   @ApiResponse({
     status: 200,
-    description: 'Retorna los datos del usuario.',
+    description: 'Retorna los datos del usuario modificado.',
     type: UserDB,
   })
   @UseGuards(JwtAuthGuard, LimitedUserGuard)
@@ -83,7 +83,7 @@ export class UsersController {
   @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
   @ApiResponse({
     status: 201,
-    description: 'Retorna los datos del usuario creado.',
+    description: 'Retorna todos los usuarios.',
     type: [UserDB],
   })
   @UseGuards(JwtAuthGuard, adminGuard)
@@ -103,7 +103,7 @@ export class UsersController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Obtener token JWT' })
+  @ApiOperation({ summary: 'Obtener token de JWT' })
   @ApiResponse({
     status: 201,
     description: 'Retorna JWT para siguientes consultas.',
