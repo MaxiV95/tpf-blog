@@ -1,27 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post } from './post.schema';
 import { PostDto } from './post.dto';
-import { CustomError } from 'src/errorExceptionFilters';
+import { UserAuthDto } from 'src/users/user.dto';
 
 @Injectable()
 export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
-  async createPost(newPost: PostDto): Promise<Post> {
-    if (!newPost.title || !newPost.content || !newPost.idAuthor)
-      throw new CustomError(
-        'Title, content and idAuthor is required',
-        400,
-        'InvalidInputError',
-      );
+  async createPost(newPost: PostDto, user: UserAuthDto): Promise<Post> {
+    if (!newPost.title || !newPost.content)
+      throw new BadRequestException('Title, content and idAuthor is required');
 
-    return await this.postModel.create(newPost);
+    return await this.postModel.create({
+      title: newPost.title,
+      content: newPost.content,
+      categories: newPost.categories,
+      idAuthor: user.id,
+    });
   }
 
-  async deletePost(id: string): Promise<Post> {
+  async deletePost(id: string, user: UserAuthDto): Promise<Post> {
     return this.postModel.deleteOne({ _id: id }).lean();
+  }
+
+  async getAllPost() {
+    // Aquí puedes implementar la lógica de paginación y filtrado de posts
+    return;
   }
 
   async getPost(id: string): Promise<Post> {
@@ -37,12 +47,11 @@ export class PostsService {
     return posts;
   }
 
-  async listPosts() {
-    // Aquí puedes implementar la lógica de paginación y filtrado de posts
-    return;
-  }
-
-  async updatePost(id: string, updatePost: PostDto): Promise<Post> {
+  async updatePost(
+    id: string,
+    updatePost: PostDto,
+    user: UserAuthDto,
+  ): Promise<Post> {
     const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
 
     if (updatePost.title !== undefined) updateFields.title = updatePost.title;
