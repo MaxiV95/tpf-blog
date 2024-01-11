@@ -16,7 +16,7 @@ export class LimitedUserGuard implements CanActivate {
     const idParam = context.getArgs()[0].params.id;
 
     if (!request.user.admin && idParam !== request.user.id)
-      throw new UnauthorizedException('Access restricted: Insufficient privileges for this operation');
+      throw new UnauthorizedException('Insufficient privileges for this operation');
 
     return true;
   }
