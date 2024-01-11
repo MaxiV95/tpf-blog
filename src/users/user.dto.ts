@@ -11,7 +11,7 @@ export interface UserAuthDto {
   readonly id: string;
   readonly email: string;
   readonly nickName: string;
-  readonly admin: boolean;
+  admin?: boolean;
 }
 
 /**
