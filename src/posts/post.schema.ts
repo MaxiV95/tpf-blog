@@ -19,7 +19,6 @@ export class Post {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true,
   })
   idAuthor: mongoose.Types.ObjectId;
 }

@@ -1,10 +1,14 @@
 //users.service.ts
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.schema';
-import { CustomError } from 'src/errorExceptionFilters';
 import { UserCreateDto, UserLoginDto, UserUpdateDto } from './user.dto';
 
 @Injectable()
@@ -27,7 +31,7 @@ export class UsersService {
 
   async login(loginUserDto: UserLoginDto): Promise<User> {
     if (!loginUserDto.password)
-      throw new CustomError('Password is required', 400, 'InvalidInputError');
+      throw new BadRequestException('Password is required');
 
     const user = await this.userModel.findOne({ email: loginUserDto.email });
 
@@ -39,11 +43,7 @@ export class UsersService {
 
   async registerUser(userCreate: UserCreateDto): Promise<User> {
     if (!userCreate.email || !userCreate.password || !userCreate.nickName)
-      throw new CustomError(
-        'Email, password and nickname is required',
-        400,
-        'InvalidInputError',
-      );
+      throw new BadRequestException('Email, password and nickname is required');
 
     const hashedPassword = await bcrypt.hash(userCreate.password, 10);
 
@@ -60,7 +60,8 @@ export class UsersService {
   async updateUser(id: string, dataUser: UserUpdateDto): Promise<User> {
     const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
 
-    if (dataUser.nickName !== undefined) updateFields.nickName = dataUser.nickName;
+    if (dataUser.nickName !== undefined)
+      updateFields.nickName = dataUser.nickName;
 
     if (dataUser.img !== undefined) updateFields.img = dataUser.img;
 
