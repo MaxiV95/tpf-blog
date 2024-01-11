@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,9 +21,11 @@ import { PostDB, PostDto } from './post.dto';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
 import { User } from 'src/auth/custom.decorator.ts';
 import { UserAuthDto } from 'src/users/user.dto';
+import { ErrorFilter } from 'src/errorExceptionFilters';
 
 @ApiTags('Posts')
 @Controller('posts')
+@UseFilters(ErrorFilter)
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
