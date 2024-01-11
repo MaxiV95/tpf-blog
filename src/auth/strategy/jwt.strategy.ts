@@ -3,10 +3,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserJWT, UserAuthDto } from 'src/users/user.dto';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -14,8 +15,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: UserJWT): UserAuthDto {
+  async validate(payload: UserJWT): Promise<UserAuthDto> {
     if (!payload) throw new UnauthorizedException('access_token is required');
-    return payload
+    payload.admin = await this.authService.isAdmin(payload.id);
+    return payload;
   }
 }
