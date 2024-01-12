@@ -21,6 +21,7 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document);
 
     await app.listen(PORT);
+    console.log(`Application is running on: http://localhost:${PORT}`);
     console.log(`Application is running on: ${await app.getUrl()}`);
   } catch (error) {
     console.error('Error starting the application:', error);
