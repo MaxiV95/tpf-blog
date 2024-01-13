@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -29,7 +30,7 @@ import { ErrorFilter } from 'src/errorExceptionFilters';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Get(':id') // login o admin
+  @Get(':id') // user o admin
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener posteo' })
   @ApiResponse({
@@ -42,7 +43,7 @@ export class PostsController {
     return this.postsService.getPost(id);
   }
 
-  @Put(':id') // login o admin
+  @Put(':id') // user o admin
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Modificar posteo' })
   @ApiResponse({
@@ -59,7 +60,7 @@ export class PostsController {
     return this.postsService.updatePost(id, updatePost, user);
   }
 
-  @Delete(':id') // login o admin
+  @Delete(':id') // user o admin
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar posteo' })
   @ApiResponse({
@@ -81,17 +82,24 @@ export class PostsController {
     return this.postsService.deletePost(id, user);
   }
 
+  /**
+   * Obtiene una lista paginada de posts.
+   * @param page Número de página deseado (por defecto es 1).
+   * @param limit Cantidad máxima de resultados por página (por defecto es 10).
+   * @returns Una lista paginada de posts.
+   */
+  // /api/posts?page=2&limit=15
   @Get() // param paginado, default 10
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener todos los posteos' })
   @ApiResponse({
     status: 200,
-    description: 'Retorna los datos del posteo.',
+    description: 'Retorna los posteos.',
     type: [PostDB],
   })
   @UseGuards(JwtAuthGuard)
-  listPosts() {
-    return this.postsService.getAllPost();
+  async listPosts(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.postsService.getAllPost(page, limit);
   }
 
   @Post()
@@ -107,12 +115,12 @@ export class PostsController {
     return this.postsService.createPost(dataPost, user);
   }
 
-  @Get('user/:idUser') // ver post de user
+  @Get('user/:idUser')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener todos los posteos de un usuario' })
   @ApiResponse({
     status: 200,
-    description: 'Retorna los datos del posteo.',
+    description: 'Retorna los posteos.',
     type: [PostDB],
   })
   @UseGuards(JwtAuthGuard)
