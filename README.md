@@ -59,9 +59,12 @@ cd tpf-blog
 npm install
 ```
 
-4. Configura la base de datos MongoDB en el archivo .env:
+4. Crea un archivo .env con los siguientes parámetros:
 ```env
+PORT=puerto_por_defecto_3001
 MONGODB_URI=your_mongodb_uri
+JWT_SECRET=P4L4bR4_5Up3R_S3CR3T4
+GITHUB_WEBHOOK_SECRET=P4L4bR4_5Up3R_S3CR3T4
 ```
 
 5. Inicia la aplicación:s
