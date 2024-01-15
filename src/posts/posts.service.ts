@@ -16,7 +16,7 @@ export class PostsService {
 
   async createPost(newPost: PostDto, user: UserAuthDto): Promise<Post> {
     if (!newPost.title || !newPost.content)
-      throw new BadRequestException('Title, content and idAuthor is required');
+      throw new BadRequestException('Title and content is required');
     return await this.postModel.create({
       title: newPost.title,
       content: newPost.content,
@@ -33,9 +33,14 @@ export class PostsService {
     return await this.postModel.deleteOne({ _id: id });
   }
 
-  async getAllPost() {
-    // Aquí puedes implementar la lógica de paginación y filtrado de posts
-    return;
+  async getAllPost(page: number = 1, limit: number = 10) {
+    const startIndex = (page - 1) * limit;
+    const paginatedPosts = await this.postModel
+      .find()
+      .skip(startIndex)
+      .limit(limit)
+      .exec();
+    return paginatedPosts;
   }
 
   async getPost(id: string): Promise<Post> {
@@ -61,6 +66,7 @@ export class PostsService {
     const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
     if (updatePost.title !== undefined) updateFields.title = updatePost.title;
     if (updatePost.content !== undefined) updateFields.img = updatePost.content;
+    if (updatePost.categories !== undefined) updateFields.categories = updatePost.categories
     return this.postModel.updateOne({ _id: id }, { $set: updateFields }).lean();
   }
 }
