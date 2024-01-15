@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -18,7 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
-import { PostDB, PostDto } from './post.dto';
+import { FullPostDB, PostDto, ReducedPostDB } from './post.dto';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
 import { User } from 'src/auth/custom.decorator.ts';
 import { UserAuthDto } from 'src/users/user.dto';
@@ -30,16 +31,15 @@ import { ErrorFilter } from 'src/errorExceptionFilters';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Get(':id') // user o admin
-  @ApiBearerAuth()
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener posteo' })
   @ApiResponse({
     status: 200,
     description: 'Retorna los datos del posteo.',
-    type: PostDB,
+    type: FullPostDB,
   })
-  @UseGuards(JwtAuthGuard)
-  getPost(@Param('id') id: string) {
+  @HttpCode(200)
+  getPost(@Param('id') id: string): Promise<FullPostDB> {
     return this.postsService.getPost(id);
   }
 
@@ -49,14 +49,15 @@ export class PostsController {
   @ApiResponse({
     status: 200,
     description: 'Retorna los datos del posteo modificado.',
-    type: PostDB,
+    type: FullPostDB,
   })
   @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   updatePost(
     @Param('id') id: string,
     @Body() updatePost: PostDto,
     @User() user: UserAuthDto,
-  ) {
+  ): Promise<FullPostDB> {
     return this.postsService.updatePost(id, updatePost, user);
   }
 
@@ -78,27 +79,27 @@ export class PostsController {
     },
   })
   @UseGuards(JwtAuthGuard)
-  deletePost(@Param('id') id: string, @User() user: UserAuthDto) {
+  @HttpCode(200)
+  deletePost(
+    @Param('id') id: string,
+    @User() user: UserAuthDto,
+  ): Promise<any[]> {
     return this.postsService.deletePost(id, user);
   }
 
-  /**
-   * Obtiene una lista paginada de posts.
-   * @param page Número de página deseado (por defecto es 1).
-   * @param limit Cantidad máxima de resultados por página (por defecto es 10).
-   * @returns Una lista paginada de posts.
-   */
   // /api/posts?page=2&limit=15
   @Get() // param paginado, default 10
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener todos los posteos' })
   @ApiResponse({
     status: 200,
     description: 'Retorna los posteos.',
-    type: [PostDB],
+    type: [ReducedPostDB],
   })
-  @UseGuards(JwtAuthGuard)
-  async listPosts(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+  @HttpCode(200)
+  listPosts(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<ReducedPostDB[]> {
     return this.postsService.getAllPost(page, limit);
   }
 
@@ -108,10 +109,14 @@ export class PostsController {
   @ApiResponse({
     status: 201,
     description: 'Retorna los datos del posteo.',
-    type: PostDB,
+    type: FullPostDB,
   })
   @UseGuards(JwtAuthGuard)
-  createPost(@Body() dataPost: PostDto, @User() user: UserAuthDto) {
+  @HttpCode(201)
+  createPost(
+    @Body() dataPost: PostDto,
+    @User() user: UserAuthDto,
+  ): Promise<FullPostDB> {
     return this.postsService.createPost(dataPost, user);
   }
 
@@ -121,10 +126,11 @@ export class PostsController {
   @ApiResponse({
     status: 200,
     description: 'Retorna los posteos.',
-    type: [PostDB],
+    type: [ReducedPostDB],
   })
   @UseGuards(JwtAuthGuard)
-  getPostUser(@Param('idUser') idUser: string) {
+  @HttpCode(200)
+  getPostUser(@Param('idUser') idUser: string): Promise<ReducedPostDB[]> {
     return this.postsService.getPostUser(idUser);
   }
 }

@@ -1,6 +1,6 @@
+//post.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-//import { User } from 'src/users/user.schema';
 
 export type PostDocument = mongoose.HydratedDocument<Post>;
 
@@ -24,4 +24,3 @@ export class Post {
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
-

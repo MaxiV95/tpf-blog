@@ -1,3 +1,4 @@
+//post.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 
 const titleProperty: Record<string, string> = {
@@ -22,11 +23,19 @@ export class PostDto {
   readonly categories?: string[];
 }
 
-export class PostDB {
+export class ReducedPostDB {
+  @ApiProperty({
+    description: 'id del post.',
+    example: '6570bb7db2ad523394706c13',
+  })
+  readonly id: string;
   @ApiProperty(titleProperty)
   readonly title: string;
   @ApiProperty(contentProperty)
   readonly content: string;
+}
+
+export class FullPostDB extends ReducedPostDB {
   @ApiProperty(categoriesProperty)
   readonly categories?: string[];
   @ApiProperty({
@@ -34,11 +43,6 @@ export class PostDB {
     example: { id: '6570bb7db2ad523394706c12', nickName: 'MaxiV95' },
   })
   readonly author: string;
-  @ApiProperty({
-    description: 'id del post.',
-    example: '6570bb7db2ad523394706c13',
-  })
-  readonly _id: string;
 }
 
 export class ModeratedPostDTO extends PostDto {
