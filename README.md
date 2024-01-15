@@ -86,3 +86,5 @@ Si deseas contribuir a este proyecto, por favor abre un issue o envía una solic
 
 ## Licencia
 Este proyecto está bajo la Licencia MIT. Puedes ver más detalles en el archivo LICENSE.
+
+https://stackedit.io/app#
