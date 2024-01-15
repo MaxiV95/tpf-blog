@@ -9,27 +9,27 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.schema';
-import { UserCreateDto, UserLoginDto, UserUpdateDto } from './user.dto';
+import { UserCreateDto, UserDB, UserLoginDto, UserUpdateDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async deleteUser(id: string): Promise<User> {
+  async deleteUser(id: string): Promise<any> {
     return this.userModel.deleteOne({ _id: id }).select('-password').lean();
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<UserDB[]> {
     return this.userModel.find().select('-password').lean();
   }
 
-  async getUser(id: string): Promise<User> {
+  async getUser(id: string): Promise<UserDB> {
     const user = await this.userModel.findById(id);
     if (!user) throw new NotFoundException(`User with id ${id} not found`);
     return user.toJSON();
   }
 
-  async login(loginUserDto: UserLoginDto): Promise<User> {
+  async login(loginUserDto: UserLoginDto): Promise<any> {
     if (!loginUserDto.password)
       throw new BadRequestException('Password is required');
 
@@ -41,7 +41,7 @@ export class UsersService {
     return user.toJSON();
   }
 
-  async registerUser(userCreate: UserCreateDto): Promise<User> {
+  async registerUser(userCreate: UserCreateDto): Promise<UserDB> {
     if (!userCreate.email || !userCreate.password || !userCreate.nickName)
       throw new BadRequestException('Email, password and nickname is required');
 
@@ -57,7 +57,7 @@ export class UsersService {
     ).toJSON();
   }
 
-  async updateUser(id: string, dataUser: UserUpdateDto): Promise<User> {
+  async updateUser(id: string, dataUser: UserUpdateDto): Promise<UserDB> {
     const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
 
     if (dataUser.nickName !== undefined)

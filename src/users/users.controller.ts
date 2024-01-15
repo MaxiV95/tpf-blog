@@ -4,19 +4,20 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { UserCreateDto, UserLoginDto, UserUpdateDto, UserDB } from './user.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserCreateDto, UserLoginDto, UserUpdateDto, UserDB } from './user.dto';
 import { UsersService } from './users.service';
 import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
@@ -40,8 +41,9 @@ export class UsersController {
     type: UserDB,
   })
   @UseGuards(JwtAuthGuard, LimitedUserGuard)
-  getUser(@Param('id') id: string) {
-    return this.usersService.getUser(id);
+  @HttpCode(200)
+  async getUserById(@Param('id') id: string): Promise<UserDB> {
+    return await this.usersService.getUser(id);
   }
 
   @Put(':id') // user o admin
@@ -53,8 +55,9 @@ export class UsersController {
     type: UserDB,
   })
   @UseGuards(JwtAuthGuard, LimitedUserGuard)
-  updateUser(@Param('id') id: string, @Body() updateUser: UserUpdateDto) {
-    return this.usersService.updateUser(id, updateUser);
+  @HttpCode(200)
+  async updateUser(@Param('id') id: string, @Body() updateUser: UserUpdateDto): Promise<UserDB> {
+    return await this.usersService.updateUser(id, updateUser);
   }
 
   @Delete(':id') // admin
@@ -75,20 +78,23 @@ export class UsersController {
     },
   })
   @UseGuards(JwtAuthGuard, adminGuard)
-  deleteUser(@Param('id') id: string) {
-    return this.usersService.deleteUser(id);
+  @HttpCode(200)
+  async deleteUser(@Param('id') id: string): Promise<UserDB> {
+    return await this.usersService.deleteUser(id);
   }
+
   @Get() // admin
   @ApiBearerAuth()
   @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Retorna todos los usuarios.',
     type: [UserDB],
   })
   @UseGuards(JwtAuthGuard, adminGuard)
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  @HttpCode(200)
+  async getAllUsers(): Promise<UserDB[]> {
+    return await this.usersService.getAllUsers();
   }
 
   @Post()
@@ -98,22 +104,33 @@ export class UsersController {
     description: 'Retorna los datos del usuario creado.',
     type: UserDB,
   })
-  register(@Body() createUser: UserCreateDto) {
-    return this.usersService.registerUser(createUser);
+  @HttpCode(201)
+  async register(@Body() createUser: UserCreateDto): Promise<UserDB> {
+    return await this.usersService.registerUser(createUser);
   }
 
   @Post('login')
   @ApiOperation({ summary: 'Obtener token de JWT' })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Retorna JWT para siguientes consultas.',
+    schema: {
+      properties: {
+        access_token: { type: 'string' },
+      },
+      example: {
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXCVI9...',
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'email o password incorrecto.',
   })
   @UseGuards(LocalAuthGuard)
-  login(@Body() loginUser: UserLoginDto, @User() user: any) {
+  @HttpCode(200)
+  async login(@Body() loginUser: UserLoginDto, @User() user: any): Promise<any> {
     return { access_token: user.access_token };
   }
 }
+
