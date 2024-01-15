@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// export interface Post {
-//   id: string;
-//   title: string;
-//   content: string;
-//   categories: string[];
-//   author: string;
-// }
-
 const titleProperty: Record<string, string> = {
   description: 'Titulo del post.',
   example: 'Nuevo post',
@@ -42,4 +34,20 @@ export class PostDB {
     example: { id: '6570bb7db2ad523394706c12', nickName: 'MaxiV95' },
   })
   readonly author: string;
+  @ApiProperty({
+    description: 'id del post.',
+    example: '6570bb7db2ad523394706c13',
+  })
+  readonly _id: string;
+}
+
+export class ModeratedPostDTO extends PostDto {
+  @ApiProperty({
+    description: 'Opciones de moderación.',
+    example: { delete: false, edit: true },
+  })
+  moderationOptions: {
+    delete?: boolean;
+    edit?: boolean;
+  };
 }
