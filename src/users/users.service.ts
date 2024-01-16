@@ -3,24 +3,27 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.schema';
-import { UserCreateDto, UserDB, UserLoginDto, UserUpdateDto } from './user.dto';
+import { UserCreateDto, UserDB, UserUpdateDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async deleteUser(id: string): Promise<any> {
-    return this.userModel.deleteOne({ _id: id }).select('-password').lean();
+    return await this.userModel
+      .deleteOne({ _id: id })
+      .select('-password')
+      .lean();
   }
 
   async getAllUsers(): Promise<UserDB[]> {
-    return this.userModel.find().select('-password').lean();
+    const users = await this.userModel.find().select('-password');
+    return users.map((user) => user.toJSON());
   }
 
   async getUser(id: string): Promise<UserDB> {
@@ -29,45 +32,35 @@ export class UsersService {
     return user.toJSON();
   }
 
-  async login(loginUserDto: UserLoginDto): Promise<any> {
-    if (!loginUserDto.password)
-      throw new BadRequestException('Password is required');
-
-    const user = await this.userModel.findOne({ email: loginUserDto.email });
-
-    if (!user || !(await bcrypt.compare(loginUserDto.password, user.password)))
-      throw new UnauthorizedException('Invalid credentials');
-
-    return user.toJSON();
-  }
-
-  async registerUser(userCreate: UserCreateDto): Promise<UserDB> {
-    if (!userCreate.email || !userCreate.password || !userCreate.nickName)
+  async registerUser(dataNewUser: UserCreateDto): Promise<UserDB> {
+    if (!dataNewUser.email || !dataNewUser.password || !dataNewUser.nickName)
       throw new BadRequestException('Email, password and nickname is required');
-
-    const hashedPassword = await bcrypt.hash(userCreate.password, 10);
-
+    const hashedPassword = await bcrypt.hash(dataNewUser.password, 10);
     return (
       await this.userModel.create({
-        email: userCreate.email,
+        email: dataNewUser.email,
         password: hashedPassword,
-        nickName: userCreate.nickName,
-        img: userCreate.img,
+        nickName: dataNewUser.nickName,
+        img: dataNewUser.img,
       })
     ).toJSON();
   }
 
-  async updateUser(id: string, dataUser: UserUpdateDto): Promise<UserDB> {
-    const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
-
-    if (dataUser.nickName !== undefined)
-      updateFields.nickName = dataUser.nickName;
-
-    if (dataUser.img !== undefined) updateFields.img = dataUser.img;
-
-    return this.userModel
-      .updateOne({ _id: id }, { $set: updateFields })
-      .select('-password')
-      .lean();
+  async updateUser(
+    id: string,
+    dataUser: UserUpdateDto,
+    isAdmin: boolean,
+  ): Promise<UserDB> {
+    const allowedFields = ['nickName', 'img']; // Campos a permitidos
+    if (isAdmin) allowedFields.push('admin');
+    const updateFields: Record<string, any> = {}; // Campos a actualizar
+    allowedFields.forEach((field) => {
+      if (dataUser[field] !== undefined) updateFields[field] = dataUser[field];
+    });
+    return (
+      await this.userModel
+        .findByIdAndUpdate({ _id: id }, { $set: updateFields })
+        .select('-password')
+    ).toJSON();
   }
 }

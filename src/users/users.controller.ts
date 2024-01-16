@@ -17,7 +17,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserCreateDto, UserLoginDto, UserUpdateDto, UserDB } from './user.dto';
+import {
+  UserCreateDto,
+  UserLoginDto,
+  UserUpdateDto,
+  UserDB,
+  UserAuthDto,
+} from './user.dto';
 import { UsersService } from './users.service';
 import { LocalAuthGuard } from 'src/auth/strategy/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
@@ -32,7 +38,7 @@ import { User } from 'src/auth/custom.decorator.ts';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id') // user o admin
+  @Get(':id') // user
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener usuario' })
   @ApiResponse({
@@ -40,7 +46,7 @@ export class UsersController {
     description: 'Retorna los datos del usuario.',
     type: UserDB,
   })
-  @UseGuards(JwtAuthGuard, LimitedUserGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   async getUserById(@Param('id') id: string): Promise<UserDB> {
     return await this.usersService.getUser(id);
@@ -56,8 +62,12 @@ export class UsersController {
   })
   @UseGuards(JwtAuthGuard, LimitedUserGuard)
   @HttpCode(200)
-  async updateUser(@Param('id') id: string, @Body() updateUser: UserUpdateDto): Promise<UserDB> {
-    return await this.usersService.updateUser(id, updateUser);
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUser: UserUpdateDto,
+    @User() user: UserAuthDto,
+  ): Promise<UserDB> {
+    return await this.usersService.updateUser(id, updateUser, user.admin);
   }
 
   @Delete(':id') // admin
@@ -129,8 +139,10 @@ export class UsersController {
   })
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
-  async login(@Body() loginUser: UserLoginDto, @User() user: any): Promise<any> {
+  async login(
+    @Body() loginUser: UserLoginDto,
+    @User() user: any,
+  ): Promise<any> {
     return { access_token: user.access_token };
   }
 }
-
