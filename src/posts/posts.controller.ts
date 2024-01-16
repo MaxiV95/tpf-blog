@@ -19,7 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
-import { FullPostDB, PostDto, ReducedPostDB } from './post.dto';
+import { PostDto, PostDB, ReducedPostDB } from './post.dto';
 import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
 import { User } from 'src/auth/custom.decorator.ts';
 import { UserAuthDto } from 'src/users/user.dto';
@@ -36,10 +36,10 @@ export class PostsController {
   @ApiResponse({
     status: 200,
     description: 'Retorna los datos del posteo.',
-    type: FullPostDB,
+    type: PostDB,
   })
   @HttpCode(200)
-  getPost(@Param('id') id: string): Promise<FullPostDB> {
+  getPost(@Param('id') id: string): Promise<PostDB> {
     return this.postsService.getPost(id);
   }
 
@@ -49,7 +49,7 @@ export class PostsController {
   @ApiResponse({
     status: 200,
     description: 'Retorna los datos del posteo modificado.',
-    type: FullPostDB,
+    type: PostDB,
   })
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
@@ -57,7 +57,7 @@ export class PostsController {
     @Param('id') id: string,
     @Body() updatePost: PostDto,
     @User() user: UserAuthDto,
-  ): Promise<FullPostDB> {
+  ): Promise<PostDB> {
     return this.postsService.updatePost(id, updatePost, user);
   }
 
@@ -80,10 +80,7 @@ export class PostsController {
   })
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  deletePost(
-    @Param('id') id: string,
-    @User() user: UserAuthDto,
-  ): Promise<any[]> {
+  deletePost(@Param('id') id: string, @User() user: UserAuthDto): Promise<any> {
     return this.postsService.deletePost(id, user);
   }
 
@@ -97,10 +94,10 @@ export class PostsController {
   })
   @HttpCode(200)
   listPosts(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page: number,
+    @Query('limit') limit?: number,
   ): Promise<ReducedPostDB[]> {
-    return this.postsService.getAllPost(page, limit);
+    return this.postsService.getAllPost(page || 1, limit || 10);
   }
 
   @Post()
@@ -109,26 +106,24 @@ export class PostsController {
   @ApiResponse({
     status: 201,
     description: 'Retorna los datos del posteo.',
-    type: FullPostDB,
+    type: PostDB,
   })
   @UseGuards(JwtAuthGuard)
   @HttpCode(201)
   createPost(
     @Body() dataPost: PostDto,
     @User() user: UserAuthDto,
-  ): Promise<FullPostDB> {
+  ): Promise<PostDB> {
     return this.postsService.createPost(dataPost, user);
   }
 
   @Get('user/:idUser')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener todos los posteos de un usuario' })
   @ApiResponse({
     status: 200,
     description: 'Retorna los posteos.',
     type: [ReducedPostDB],
   })
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   getPostUser(@Param('idUser') idUser: string): Promise<ReducedPostDB[]> {
     return this.postsService.getPostUser(idUser);

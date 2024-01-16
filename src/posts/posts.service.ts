@@ -8,20 +8,23 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post } from './post.schema';
-import { FullPostDB, PostDto, ReducedPostDB } from './post.dto';
+import { PostDto, PostDB, ReducedPostDB } from './post.dto';
 import { UserAuthDto } from 'src/users/user.dto';
 
 @Injectable()
 export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
-  async createPost(dataPost: PostDto, user: UserAuthDto): Promise<FullPostDB> {
-    if (!dataPost.title || !dataPost.content)
+  async createPost(
+    dataNewPost: PostDto,
+    user: UserAuthDto,
+  ): Promise<PostDB> {
+    if (!dataNewPost.title || !dataNewPost.content)
       throw new BadRequestException('Title and content is required');
     const newPost = await this.postModel.create({
-      title: dataPost.title,
-      content: dataPost.content,
-      categories: dataPost.categories,
+      title: dataNewPost.title,
+      content: dataNewPost.content,
+      categories: dataNewPost.categories,
       idAuthor: user.id,
     });
     const post = await this.postModel
@@ -61,7 +64,7 @@ export class PostsService {
     return paginatedPosts.map((post) => this.toJSON(post));
   }
 
-  async getPost(id: string): Promise<FullPostDB> {
+  async getPost(id: string): Promise<PostDB> {
     const post = await this.postModel
       .findById(id)
       .populate('idAuthor', '_id nickName')
@@ -81,24 +84,23 @@ export class PostsService {
 
   async updatePost(
     id: string,
-    updatePost: PostDto,
+    dataPost: PostDto,
     user: UserAuthDto,
-  ): Promise<any> {
-    const post = await this.postModel.findById(id).exec();
-    if (!post) throw new NotFoundException('Post not found');
-    if (!user.admin && post.idAuthor.toString() !== user.id)
-      throw new UnauthorizedException(
-        'Insufficient privileges for this operation',
-      );
-    const updateFields: Record<string, any> = {}; // Objeto para almacenar campos a actualizar
-    if (updatePost.title !== undefined) updateFields.title = updatePost.title;
-    if (updatePost.content !== undefined) updateFields.img = updatePost.content;
-    if (updatePost.categories !== undefined)
-      updateFields.categories = updatePost.categories;
+  ): Promise<PostDB> {
+    const allowedFields = ['title', 'content', 'categories']; // Campos a permitidos
+    const updateFields: Record<string, any> = {}; // Campos a actualizar
+    allowedFields.forEach((field) => {
+      if (dataPost[field] !== undefined) updateFields[field] = dataPost[field];
+    });
+    const updateQuery = user.admin
+      ? { _id: id }
+      : { _id: id, idAuthor: user.id };
     const updatedPost = await this.postModel
-      .findOneAndUpdate({ _id: id }, { $set: updateFields }, { new: true })
+      .findOneAndUpdate(updateQuery, { $set: updateFields }, { new: true })
       .populate('idAuthor', '_id nickName')
       .exec();
+    if (!updatedPost)
+      throw new NotFoundException('Post not found or user not authorized');
     return this.toJSON(updatedPost);
   }
 
