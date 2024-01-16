@@ -8,6 +8,7 @@ import { join } from 'path';
 // import type { RedisClientOptions } from 'redis';
 // import { redisStore } from 'cache-manager-redis-yet';
 
+import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { GithubModule } from './github/github.module';
@@ -19,6 +20,7 @@ import { DiscordService } from './github/discord.service';
 
 @Module({
   imports: [
+    AdminModule,
     AuthModule,
     ChatModule,
     CacheModule.register({ isGlobal: true }),

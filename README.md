@@ -148,6 +148,7 @@ volver al [Índice](#índice)
       admin: false,
       img: 'https://avatars.githubusercontent.com/u/118027004',
     },
+    // Otros resultados de búsqueda...
   ];
   ```
 
@@ -279,8 +280,8 @@ Volver al [Índice](#índice)
 - **Params**:
 - **Query**:
   ```typescript
-  "page": number - optional - Numero de pagina, por defecto 1.
-  "limit": number - optional - Numero de posteos por pagina, por defecto 10.
+  "page": number - optional - Número de página (por defecto es 1).
+  "limit": number - optional - Cantidad de resultados por página (por defecto es 10).
   ```
 - **header**:
 - **Body**:
@@ -292,6 +293,7 @@ Volver al [Índice](#índice)
       title: "Nuevo post",
       content: "Este es un ejemplo de contenido de post",
     },
+    // Otros resultados de búsqueda...
   ];
   ```
 
@@ -397,9 +399,6 @@ Volver al [Índice](#índice)
   ```
 - **Query**:
 - **header**:
-  ```typescript
-  "bearer": string - required - token de acceso de usuario.
-  ```
 - **Body**:
 - **Request Body** example: Status **200**
   ```typescript
@@ -409,30 +408,110 @@ Volver al [Índice](#índice)
       title: 'Nuevo post',
       content: 'Este es un ejemplo de contenido de post',
     },
+    // Otros resultados de búsqueda...
   ];
   ```
 
 Volver al [Índice](#índice)
 
-## \_\_
-
 - **`GET /posts/search`** - Buscar posts por título, contenido, etc. Debe admitir parámetros para paginar resultados (el default de resultados si no hay param será 10)
+- **Params**:
+- **Query**:
+  ```typescript
+  "query": string - required - Término de búsqueda.
+  "page": number - optional - Número de página (por defecto es 1).
+  "limit": number - optional - Cantidad de resultados por página (por defecto es 10).
+  ```
+- **header**:
+- **Body**:
+- **Request Body** example: Status **200**
+  ```typescript
+  [
+    {
+      id: '6570bb7db2ad523394706c13',
+      title: 'Nuevo post',
+      content: 'Este es un ejemplo de contenido de post',
+    },
+    // Otros resultados de búsqueda...
+  ];
+  ```
 
 Volver al [Índice](#índice)
 
 - **`GET /posts/filter`** - Endpoints adicionales para filtrar posts por categoría o autor
+- **Params**:
+- **Query**:
+  ```typescript
+  "category": string - optional - Categoría por la cual filtrar los posts.
+  "author": string - optional - ID del autor por el cual filtrar los posts.
+  "page": number - optional - Número de página (por defecto es 1).
+  "limit": number - optional - Cantidad de resultados por página (por defecto es 10).
+  ```
+- **header**:
+- **Body**:
+- **Request Body** example: Status **200**
+  ```typescript
+  [
+    {
+      id: '6570bb7db2ad523394706c13',
+      title: 'Nuevo post',
+      content: 'Este es un ejemplo de contenido de post',
+    },
+    // Otros resultados de búsqueda...
+  ];
+  ```
 
 Volver al [Índice](#índice)
 
 ### **Administración**
 
 - **`GET /admin/users`** - Obtener todos los usuarios (solo administradores).
+- **Params**:
+- **Query**:
+- **header**:
+  ```typescript
+  "bearer": string - required - token de acceso de usuario.
+  ```
+- **Body**:
+- **Request Body** example: Status **200**
+  ```typescript
+  [
+    {
+      id: '6570bb7db2ad523394706c12',
+      email: 'maxi@gmail.com',
+      nickName: 'MaxiV95',
+      admin: false,
+      img: 'https://avatars.githubusercontent.com/u/118027004',
+    },
+    // Otros resultados de búsqueda...
+  ];
+  ```
+
+Volver al [Índice](#índice)
+
 - **`DELETE /admin/users/{:id}`** - Eliminar usuarios (solo administradores).
+- **Params**:
+- **Query**:
+- **header**:
+  ```typescript
+  "bearer": string - required - token de acceso de usuario.
+  ```
+- **Body**:
+- **Request Body** example: Status **200**
+  ```typescript
+  {
+    acknowledged: true,
+    deletedCount: 1
+  }
+  ```
+
+Volver al [Índice](#índice)
+
+## \_\_
+
 - **`GET /admin/posts`** - Obtener todos los posts con opciones de moderación (borrar o editar) (solo administradores).
 
-Cada endpoint protegido debe ser asegurado mediante el middleware de autenticación, y para las rutas administrativas, un middleware adicional que verifique si el usuario es un administrador.
-
-Los endpoints deberán ser documentados para poder ser consumidos por un frontend. También se incluirán test y logging donde corresponda.
+También se incluirán test.
 
 ## Uso
 
