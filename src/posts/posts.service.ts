@@ -15,10 +15,7 @@ import { UserAuthDto } from 'src/users/user.dto';
 export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
-  async createPost(
-    dataNewPost: PostDto,
-    user: UserAuthDto,
-  ): Promise<PostDB> {
+  async createPost(dataNewPost: PostDto, user: UserAuthDto): Promise<PostDB> {
     if (!dataNewPost.title || !dataNewPost.content)
       throw new BadRequestException('Title and content is required');
     const newPost = await this.postModel.create({
@@ -102,6 +99,47 @@ export class PostsService {
     if (!updatedPost)
       throw new NotFoundException('Post not found or user not authorized');
     return this.toJSON(updatedPost);
+  }
+
+  async searchPosts(
+    query: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ReducedPostDB[]> {
+    const startIndex = (page - 1) * limit;
+    const searchResults = await this.postModel
+      .find({
+        $or: [
+          { title: { $regex: new RegExp(query, 'i') } },
+          { content: { $regex: new RegExp(query, 'i') } },
+        ],
+      })
+      .skip(startIndex)
+      .limit(limit)
+      .select('-idAuthor -categories')
+      .exec();
+    return searchResults.map((post) => this.toJSON(post));
+  }
+
+  async filterPosts(
+    category: string,
+    author: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ReducedPostDB[]> {
+    const startIndex = (page - 1) * limit;
+    const filterResults = await this.postModel
+      .find({
+        $and: [
+          category ? { categories: category } : {},
+          author ? { idAuthor: author } : {},
+        ],
+      })
+      .skip(startIndex)
+      .limit(limit)
+      .select('-idAuthor -categories')
+      .exec();
+    return filterResults.map((post) => this.toJSON(post));
   }
 
   /**

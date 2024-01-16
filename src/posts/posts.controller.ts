@@ -31,6 +31,89 @@ import { ErrorFilter } from 'src/errorExceptionFilters';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  // /api/posts?page=2&limit=15
+  @Get() // param paginado, default 10
+  @ApiOperation({ summary: 'Obtener todos los posteos' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna los posteos.',
+    type: [ReducedPostDB],
+  })
+  @HttpCode(200)
+  async listPosts(
+    @Query('page') page: number,
+    @Query('limit') limit?: number,
+  ): Promise<ReducedPostDB[]> {
+    return await this.postsService.getAllPost(page || 1, limit || 10);
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Buscar posts por título, contenido, etc.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna los resultados de la búsqueda.',
+    type: [ReducedPostDB],
+  })
+  @HttpCode(200)
+  async searchPosts(
+    @Query('query') query: string,
+    @Query('page') page: number,
+    @Query('limit') limit?: number,
+  ): Promise<ReducedPostDB[]> {
+    return await this.postsService.searchPosts(query, page || 1, limit || 10);
+  }
+
+  @Get('filter')
+  @ApiOperation({ summary: 'Filtrar posts por categoría o autor.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna los posts filtrados.',
+    type: [ReducedPostDB],
+  })
+  @HttpCode(200)
+  async filterPosts(
+    @Query('category') category: string,
+    @Query('author') author: string,
+    @Query('page') page: number,
+    @Query('limit') limit?: number,
+  ): Promise<ReducedPostDB[]> {
+    return await this.postsService.filterPosts(
+      category,
+      author,
+      page || 1,
+      limit || 10,
+    );
+  }
+
+  @Get('user/:idUser')
+  @ApiOperation({ summary: 'Obtener todos los posteos de un usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna los posteos.',
+    type: [ReducedPostDB],
+  })
+  @HttpCode(200)
+  async getPostUser(@Param('idUser') idUser: string): Promise<ReducedPostDB[]> {
+    return await this.postsService.getPostUser(idUser);
+  }
+
+  @Post()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Crear posteo' })
+  @ApiResponse({
+    status: 201,
+    description: 'Retorna los datos del posteo.',
+    type: PostDB,
+  })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(201)
+  async createPost(
+    @Body() dataPost: PostDto,
+    @User() user: UserAuthDto,
+  ): Promise<PostDB> {
+    return await this.postsService.createPost(dataPost, user);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener posteo' })
   @ApiResponse({
@@ -39,8 +122,8 @@ export class PostsController {
     type: PostDB,
   })
   @HttpCode(200)
-  getPost(@Param('id') id: string): Promise<PostDB> {
-    return this.postsService.getPost(id);
+  async getPost(@Param('id') id: string): Promise<PostDB> {
+    return await this.postsService.getPost(id);
   }
 
   @Put(':id') // user o admin
@@ -53,12 +136,12 @@ export class PostsController {
   })
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  updatePost(
+  async updatePost(
     @Param('id') id: string,
     @Body() updatePost: PostDto,
     @User() user: UserAuthDto,
   ): Promise<PostDB> {
-    return this.postsService.updatePost(id, updatePost, user);
+    return await this.postsService.updatePost(id, updatePost, user);
   }
 
   @Delete(':id') // user o admin
@@ -80,52 +163,10 @@ export class PostsController {
   })
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  deletePost(@Param('id') id: string, @User() user: UserAuthDto): Promise<any> {
-    return this.postsService.deletePost(id, user);
-  }
-
-  // /api/posts?page=2&limit=15
-  @Get() // param paginado, default 10
-  @ApiOperation({ summary: 'Obtener todos los posteos' })
-  @ApiResponse({
-    status: 200,
-    description: 'Retorna los posteos.',
-    type: [ReducedPostDB],
-  })
-  @HttpCode(200)
-  listPosts(
-    @Query('page') page: number,
-    @Query('limit') limit?: number,
-  ): Promise<ReducedPostDB[]> {
-    return this.postsService.getAllPost(page || 1, limit || 10);
-  }
-
-  @Post()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Crear posteo' })
-  @ApiResponse({
-    status: 201,
-    description: 'Retorna los datos del posteo.',
-    type: PostDB,
-  })
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(201)
-  createPost(
-    @Body() dataPost: PostDto,
+  async deletePost(
+    @Param('id') id: string,
     @User() user: UserAuthDto,
-  ): Promise<PostDB> {
-    return this.postsService.createPost(dataPost, user);
-  }
-
-  @Get('user/:idUser')
-  @ApiOperation({ summary: 'Obtener todos los posteos de un usuario' })
-  @ApiResponse({
-    status: 200,
-    description: 'Retorna los posteos.',
-    type: [ReducedPostDB],
-  })
-  @HttpCode(200)
-  getPostUser(@Param('idUser') idUser: string): Promise<ReducedPostDB[]> {
-    return this.postsService.getPostUser(idUser);
+  ): Promise<any> {
+    return await this.postsService.deletePost(id, user);
   }
 }
