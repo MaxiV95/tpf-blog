@@ -1,4 +1,4 @@
-// users.controller.ts
+// admin.controller.ts
 import {
   Controller,
   Param,
@@ -6,6 +6,7 @@ import {
   Delete,
   UseFilters,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { UserDB } from 'src/users/user.dto';
 import {
@@ -27,6 +28,18 @@ import { adminGuard } from 'src/auth/guard/admin.guard';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Get('users')
+  @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna todos los usuarios.',
+    type: [UserDB],
+  })
+  @HttpCode(200)
+  async getAllUsers(): Promise<UserDB[]> {
+    return await this.adminService.getAllUsers();
+  }
+
   @Delete('users/:id')
   @ApiOperation({ summary: 'ADMIN Eliminar usuario' })
   @ApiResponse({
@@ -43,19 +56,9 @@ export class AdminController {
       },
     },
   })
-  deleteUser(@Param('id') id: string) {
-    return this.adminService.deleteUser(id);
-  }
-
-  @Get('users')
-  @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
-  @ApiResponse({
-    status: 201,
-    description: 'Retorna todos los usuarios.',
-    type: [UserDB],
-  })
-  getAllUsers() {
-    return this.adminService.getAllUsers();
+  @HttpCode(200)
+  async deleteUser(@Param('id') id: string) {
+    return await this.adminService.deleteUser(id);
   }
 
   // @Get('posts')
