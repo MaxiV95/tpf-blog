@@ -72,6 +72,7 @@ Asegúrate de tener instalados los siguientes requisitos antes de ejecutar la ap
   ```
 
 La aplicación estará disponible en http://localhost:3001.
+La documentación de la API estará disponible en http://localhost:3001/docs
 
 Volver al [Índice](#índice)
 
@@ -195,6 +196,7 @@ volver al [Índice](#índice)
   {
     "nickName": string - optional - Nombre de usuario.
     "img": string - optional - Enlace de la imagen del usuario.
+    "admin": boolean - optional - Restringido a administradores
   }
   ```
 - **Request Body** example: Status **200**
@@ -308,14 +310,14 @@ Volver al [Índice](#índice)
 - **Request Body** example: Status **200**
   ```typescript
   {
+    id: "6570bb7db2ad523394706c13",
     title: "Nuevo post",
     content: "Este es un ejemplo de contenido de post",
-    id: "6570bb7db2ad523394706c13",
     categories: [
       "Nuevo",
       "Ejemplo"
     ],
-    Author: {
+    author: {
       id: "6570bb7db2ad523394706c12",
       nickName: "MaxiV95"
     }
@@ -347,14 +349,14 @@ Volver al [Índice](#índice)
 - **Request Body** example: Status **200**
   ```typescript
   {
+    id: "6570bb7db2ad523394706c13",
     title: "Nuevo post",
     content: "Este es un ejemplo de contenido de post",
-    id: "6570bb7db2ad523394706c13",
     categories: [
       "Nuevo",
       "Ejemplo"
     ],
-    Author: {
+    author: {
       id: "6570bb7db2ad523394706c12",
       nickName: "MaxiV95"
     }
@@ -386,13 +388,41 @@ Volver al [Índice](#índice)
 
 Volver al [Índice](#índice)
 
-## \_\_
-
 ### **Búsqueda y Filtrado**
 
-- **`GET /posts/user/{:userId}`** - Ver todos los posts de un usuario específico.
+- **`GET /posts/user/{:idUser}`** - Ver todos los posts de un usuario específico.
+- **Params**:
+  ```typescript
+  "idUser": string - required - id del usuario.
+  ```
+- **Query**:
+- **header**:
+  ```typescript
+  "bearer": string - required - token de acceso de usuario.
+  ```
+- **Body**:
+- **Request Body** example: Status **200**
+  ```typescript
+  [
+    {
+      id: '6570bb7db2ad523394706c13',
+      title: 'Nuevo post',
+      content: 'Este es un ejemplo de contenido de post',
+    },
+  ];
+  ```
+
+Volver al [Índice](#índice)
+
+## \_\_
+
 - **`GET /posts/search`** - Buscar posts por título, contenido, etc. Debe admitir parámetros para paginar resultados (el default de resultados si no hay param será 10)
+
+Volver al [Índice](#índice)
+
 - **`GET /posts/filter`** - Endpoints adicionales para filtrar posts por categoría o autor
+
+Volver al [Índice](#índice)
 
 ### **Administración**
 
@@ -411,10 +441,6 @@ Los endpoints deberán ser documentados para poder ser consumidos por un fronten
 - Crea, actualiza y elimina posts.
 - Explora el listado de posts y realiza búsquedas y filtros.
 - Accede al panel de administración si tienes permisos de administrador.
-
-## Documentación
-
-Toda la documentación de la API estará disponible en http://localhost:3001/docs una vez que inicies la aplicación.
 
 ## Contribuciones
 
