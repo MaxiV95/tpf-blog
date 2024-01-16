@@ -15,14 +15,11 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async deleteUser(id: string): Promise<any> {
-    return await this.userModel
-      .deleteOne({ _id: id })
-      .select('-password')
-      .lean();
+    return await this.userModel.deleteOne({ _id: id }).lean();
   }
 
   async getAllUsers(): Promise<UserDB[]> {
-    const users = await this.userModel.find().select('-password');
+    const users = await this.userModel.find();
     return users.map((user) => user.toJSON());
   }
 
@@ -58,9 +55,10 @@ export class UsersService {
       if (dataUser[field] !== undefined) updateFields[field] = dataUser[field];
     });
     return (
-      await this.userModel
-        .findByIdAndUpdate({ _id: id }, { $set: updateFields })
-        .select('-password')
+      await this.userModel.findByIdAndUpdate(
+        { _id: id },
+        { $set: updateFields },
+      )
     ).toJSON();
   }
 }

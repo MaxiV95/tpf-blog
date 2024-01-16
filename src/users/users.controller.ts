@@ -38,6 +38,56 @@ import { User } from 'src/auth/custom.decorator.ts';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get() // admin
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna todos los usuarios.',
+    type: [UserDB],
+  })
+  @UseGuards(JwtAuthGuard, adminGuard)
+  @HttpCode(200)
+  async getAllUsers(): Promise<UserDB[]> {
+    return await this.usersService.getAllUsers();
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Obtener token de JWT' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna JWT para siguientes consultas.',
+    schema: {
+      properties: {
+        access_token: { type: 'string' },
+      },
+      example: {
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXCVI9...',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'email o password incorrecto.',
+  })
+  @UseGuards(LocalAuthGuard)
+  @HttpCode(200)
+  login(@Body() loginUser: UserLoginDto, @User() user: any) {
+    return { access_token: user.access_token };
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Crear usuario' })
+  @ApiResponse({
+    status: 201,
+    description: 'Retorna los datos del usuario creado.',
+    type: UserDB,
+  })
+  @HttpCode(201)
+  async register(@Body() createUser: UserCreateDto): Promise<UserDB> {
+    return await this.usersService.registerUser(createUser);
+  }
+
   @Get(':id') // user
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener usuario' })
@@ -89,60 +139,7 @@ export class UsersController {
   })
   @UseGuards(JwtAuthGuard, adminGuard)
   @HttpCode(200)
-  async deleteUser(@Param('id') id: string): Promise<UserDB> {
+  async deleteUser(@Param('id') id: string): Promise<any> {
     return await this.usersService.deleteUser(id);
-  }
-
-  @Get() // admin
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
-  @ApiResponse({
-    status: 200,
-    description: 'Retorna todos los usuarios.',
-    type: [UserDB],
-  })
-  @UseGuards(JwtAuthGuard, adminGuard)
-  @HttpCode(200)
-  async getAllUsers(): Promise<UserDB[]> {
-    return await this.usersService.getAllUsers();
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Crear usuario' })
-  @ApiResponse({
-    status: 201,
-    description: 'Retorna los datos del usuario creado.',
-    type: UserDB,
-  })
-  @HttpCode(201)
-  async register(@Body() createUser: UserCreateDto): Promise<UserDB> {
-    return await this.usersService.registerUser(createUser);
-  }
-
-  @Post('login')
-  @ApiOperation({ summary: 'Obtener token de JWT' })
-  @ApiResponse({
-    status: 200,
-    description: 'Retorna JWT para siguientes consultas.',
-    schema: {
-      properties: {
-        access_token: { type: 'string' },
-      },
-      example: {
-        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXCVI9...',
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'email o password incorrecto.',
-  })
-  @UseGuards(LocalAuthGuard)
-  @HttpCode(200)
-  async login(
-    @Body() loginUser: UserLoginDto,
-    @User() user: any,
-  ): Promise<any> {
-    return { access_token: user.access_token };
   }
 }
