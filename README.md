@@ -465,7 +465,7 @@ Volver al [Índice](#índice)
 
 ### **Administración**
 
-- **`GET /admin/users`** - Obtener todos los usuarios (solo administradores).
+- **`GET /admin/users`** - (restringido a administradores) Obtener todos los usuarios.
 - **Params**:
 - **Query**:
 - **header**:
@@ -489,7 +489,7 @@ Volver al [Índice](#índice)
 
 Volver al [Índice](#índice)
 
-- **`DELETE /admin/users/{:id}`** - Eliminar usuarios (solo administradores).
+- **`DELETE /admin/users/{:id}`** - (restringido a administradores) Eliminar usuarios.
 - **Params**:
 - **Query**:
 - **header**:
@@ -507,9 +507,31 @@ Volver al [Índice](#índice)
 
 Volver al [Índice](#índice)
 
-## \_\_
+- **`GET /admin/posts`** - Obtener todos los posts con opciones de moderación (borrar o editar) .
+- **Params**:
+- **Query**:
+- **header**:
+  ```typescript
+  "bearer": string - required - token de acceso de usuario.
+  ```
+- **Body**:
+- **Request Body** example - Status **200**:
+  ```typescript
+  [
+    {
+      id: 'post_id_1',
+      title: 'Título del Post 1',
+      content: 'Contenido del Post 1',
+    },
+    // Otros resultados de búsqueda...
+  ];
+  ```
 
-- **`GET /admin/posts`** - Obtener todos los posts con opciones de moderación (borrar o editar) (solo administradores).
+**Nota:** _Si el usuario que realiza la solicitud es un administrador, se devolverán todos los posts. Si el usuario no es un administrador, se devolverán solo los posts asociados a ese usuario._
+
+Volver al [Índice](#índice)
+
+## \_\_
 
 También se incluirán test.
 
@@ -528,5 +550,3 @@ Si deseas contribuir a este proyecto, por favor abre un issue o envía una solic
 ## Licencia
 
 Este proyecto está bajo la Licencia MIT. Puedes ver más detalles en el archivo LICENSE.
-
-https://stackedit.io/app#
