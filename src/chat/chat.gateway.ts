@@ -18,13 +18,7 @@ export class ChatGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket: Socket) => {
-      // Al conectar un cliente
-
-      const {
-        token,
-        name,
-        //email = 'maxi@google.com',
-      } = socket.handshake.auth;
+      const { token, name } = socket.handshake.auth;
 
       if (!name) {
         // verificaciones para rechazar connection
@@ -75,6 +69,20 @@ export class ChatGateway implements OnModuleInit {
     this.server.to('private-room').emit('on-private-message', {
       userId: client.id,
       message: message,
+      name: name,
+    });
+  }
+
+  @SubscribeMessage('typing')
+  handleTypingEvent(
+    @MessageBody() message: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { name } = client.handshake.auth;
+    console.log(name, message.isTyping, client.id);
+    this.server.to('private-room').emit('on-typing', {
+      userId: client.id,
+      isTyping: message.isTyping,
       name: name,
     });
   }

@@ -22,14 +22,13 @@
     const input = document.querySelector('input');
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      const name = input.value;
+      const name = input.value.trim();
       if (name) {
         localStorage.setItem('name', name);
         window.location.href = 'chat.html';
       }
-    })
+    });
   </script>
-
 </body>
 
 </html>

@@ -37,29 +37,25 @@
       </div>
 
       <div class="messages" id="chat">
-
         <!-- Mostrar tiempo -->
         <div class="time" id="last-time-sent">Hoy a las 02:00</div>
-
         <!-- Mensajes de otros -->
         <div class="message ">
           Hi!
         </div>
-
         <!-- Mis mensajes -->
         <div class="message incoming">
-          Hi!
+          Hi!!
         </div>
-
+        
+        <!-- Burbujas mientras escribe -->
+        <div class="message hidden" id="typing">
+          <div class="typing typing-1"></div>
+          <div class="typing typing-2"></div>
+          <div class="typing typing-3"></div>
+        </div>
       </div>
-      <!-- Burbujas mientras escribe -->
-      <div class="message stark">
-        <div class="typing typing-1"></div>
-        <div class="typing typing-2"></div>
-        <div class="typing typing-3"></div>
-      </div>
-
-
+        
       <!-- Inputs y Forms -->
       <form class="input">
         <input placeholder="Escribe tu mensaje aquí" type="text" />
@@ -72,7 +68,6 @@
   <!-- Scripts -->
   <script src="socket.io/socket.io.min.js"></script>
   <script src="js/chat.js"></script>
-
 </body>
 
 </html>

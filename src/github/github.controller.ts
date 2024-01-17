@@ -2,7 +2,7 @@
 // https://smee.io/
 // smee --url https://smee.io/JTaHDEnckkZwVfty --target http://localhost:3001/github
 import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { GithubService } from './github.service';
 import { GitHubEvent, GitHubPayload } from './github.interface';
 import { GithubGuard } from './github.guard';
@@ -14,6 +14,7 @@ export class GithubController {
 
   @Post()
   @UseGuards(GithubGuard)
+  @ApiExcludeEndpoint()
   webhookHandler(
     @Headers('x-github-event') githubEvent: GitHubEvent, // Header personalizado
     @Headers('X-Hub-Signature-256') signature: string, // Llave secreta encriptada
