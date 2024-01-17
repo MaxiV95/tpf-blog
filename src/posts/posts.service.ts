@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { Post } from './post.schema';
 import { PostDto, PostDB, ReducedPostDB } from './post.dto';
 import { UserAuthDto } from 'src/users/user.dto';
+import { toJSON } from './postToJSON';
 
 @Injectable()
 export class PostsService {
@@ -28,7 +29,7 @@ export class PostsService {
       .findById(newPost.id)
       .populate('idAuthor', '_id nickName')
       .exec();
-    return this.toJSON(post);
+    return toJSON(post);
   }
 
   async deletePost(id: string, user: UserAuthDto): Promise<any> {
@@ -58,7 +59,7 @@ export class PostsService {
       .limit(limit)
       .select('-idAuthor -categories')
       .exec();
-    return paginatedPosts.map((post) => this.toJSON(post));
+    return paginatedPosts.map((post) => toJSON(post));
   }
 
   async getPost(id: string): Promise<PostDB> {
@@ -66,7 +67,7 @@ export class PostsService {
       .findById(id)
       .populate('idAuthor', '_id nickName')
       .exec();
-    return this.toJSON(post);
+    return toJSON(post);
   }
 
   async getPostUser(idUser: string): Promise<ReducedPostDB[]> {
@@ -76,7 +77,7 @@ export class PostsService {
       .exec();
     if (!posts)
       throw new NotFoundException(`Posts with IDUser ${idUser} not found`);
-    return posts.map((post) => this.toJSON(post));
+    return posts.map((post) => toJSON(post));
   }
 
   async updatePost(
@@ -98,7 +99,7 @@ export class PostsService {
       .exec();
     if (!updatedPost)
       throw new NotFoundException('Post not found or user not authorized');
-    return this.toJSON(updatedPost);
+    return toJSON(updatedPost);
   }
 
   async searchPosts(
@@ -118,7 +119,7 @@ export class PostsService {
       .limit(limit)
       .select('-idAuthor -categories')
       .exec();
-    return searchResults.map((post) => this.toJSON(post));
+    return searchResults.map((post) => toJSON(post));
   }
 
   async filterPosts(
@@ -139,29 +140,6 @@ export class PostsService {
       .limit(limit)
       .select('-idAuthor -categories')
       .exec();
-    return filterResults.map((post) => this.toJSON(post));
+    return filterResults.map((post) => toJSON(post));
   }
-
-  /**
-   * Obtiene una lista paginada de posts.
-   * Es necesario agregar .populate('idAuthor', '_id nickName') en el llamado a DB
-   * @param post Objeto post devuelto por MongoDB.
-   * @returns Post formateado.
-   */
-  private toJSON = (post: any) => {
-    return post.toObject({
-      transform: (doc: any, ret: Record<string, any>) => {
-        delete ret.__v;
-        ret.id = ret._id;
-        delete ret._id;
-        if (ret.idAuthor) {
-          ret.author = {
-            id: ret.idAuthor.id,
-            nickName: ret.idAuthor.nickName,
-          };
-          delete ret.idAuthor;
-        }
-      },
-    });
-  };
 }
