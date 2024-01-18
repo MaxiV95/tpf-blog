@@ -69,6 +69,7 @@ export class UserCreateDto extends UserLoginDto {
   readonly nickName: string;
   @ApiPropertyOptional(imgProperty)
   readonly img?: string;
+  readonly admin?: boolean;
 }
 
 /**
@@ -94,7 +95,7 @@ export class UserUpdateDto {
  */
 export class UserDB {
   @ApiProperty(idProperty)
-  readonly _id: string;
+  readonly id: string;
   @ApiProperty(emailProperty)
   readonly email: string;
   @ApiProperty(nickNameProperty)

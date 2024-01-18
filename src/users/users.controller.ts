@@ -55,7 +55,7 @@ export class UsersController {
   @Post('login')
   @ApiOperation({ summary: 'Obtener token de JWT' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Retorna JWT para siguientes consultas.',
     schema: {
       properties: {
@@ -71,7 +71,7 @@ export class UsersController {
     description: 'email o password incorrecto.',
   })
   @UseGuards(LocalAuthGuard)
-  @HttpCode(200)
+  @HttpCode(201)
   login(@Body() loginUser: UserLoginDto, @User() user: any) {
     return { access_token: user.access_token };
   }
