@@ -34,7 +34,11 @@ import { DiscordService } from './github/discord.service';
      }), */
     ConfigModule.forRoot({ isGlobal: true, load: [] }),
     GithubModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/blog'),
+    MongooseModule.forRoot(
+      process.env.NODE_ENV === 'test'
+        ? process.env.MONGO_TEST_URL || 'mongodb://127.0.0.1:27017/blogTest'
+        : process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/blog',
+    ),
     NewsModule,
     PostsModule,
     ServeStaticModule.forRoot({ rootPath: join(__dirname, '..', 'public') }),
