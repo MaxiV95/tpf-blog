@@ -32,9 +32,9 @@ Volver al [Índice](#índice)
 
 Asegúrate de tener instalados los siguientes requisitos antes de ejecutar la aplicación:
 
-- NPM
-- Node
-- MongoDB
+- **NPM**: Versión >= 10.3.0
+- **Node.js**: Versión >= 18.19.0
+- **MongoDB**: Asegúrate de tener MongoDB instalado y en ejecución.
 
 ### Instalación
 
@@ -60,18 +60,31 @@ Asegúrate de tener instalados los siguientes requisitos antes de ejecutar la ap
 
 - ```env
   PORT=puerto_por_defecto_3001
-  MONGODB_URI=your_mongodb_uri
+  MONGO_URL=uri_por_defecto_mongodb://127.0.0.1:27017/blog
+  MONGO_TEST_URL=uri_por_defecto_mongodb://127.0.0.1:27017/blogTest
   JWT_SECRET=P4L4bR4_5Up3R_S3CR3T4
   GITHUB_WEBHOOK_SECRET=P4L4bR4_5Up3R_S3CR3T4
   ```
 
-5. Inicia la aplicación:s
+5. Para iniciar la aplicación:
 
 - ```bash
   npm start
   ```
 
-La aplicación estará disponible en http://localhost:3001.
+6. Para correr test unitarios:
+
+- ```bash
+  npm test
+  ```
+
+7. Para correr test de extremo a extremo:
+
+- ```bash
+  npm test:e2e
+  ```
+
+La aplicación estará disponible en http://localhost:3001.  
 La documentación de la API estará disponible en http://localhost:3001/docs
 
 Volver al [Índice](#índice)
@@ -119,7 +132,7 @@ volver al [Índice](#índice)
     "password": string - required - Contraseña del usuario.
   }
   ```
-- **Request Body** example: Status **200**
+- **Request Body** example: Status **201**
   ```typescript
   {
     access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXCVI9...';
