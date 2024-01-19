@@ -5,7 +5,7 @@ import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 import { User } from '../user.schema';
 import userTestModel from './user.test.model';
-import { UserCreateDto, UserDB } from '../user.dto';
+import { UserCreateDto, UserDB, UserLoginDto } from '../user.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -32,8 +32,7 @@ describe('UsersController', () => {
   });
 
   it('should create a new user', async () => {
-    // Datos simulados para la creación de usuarios.
-    const UserDB: UserDB= {
+    const UserDB: UserDB = {
       id: '6570bb7db2ad523394706c12',
       email: 'test@example.com',
       nickName: 'testUser',
@@ -47,16 +46,20 @@ describe('UsersController', () => {
       img: 'avatar.jpg',
       admin: true,
     };
-
-    // Simule el método de servicio para devolver un resultado predefinido
-    jest
-      .spyOn(service, 'registerUser')
-      .mockImplementation(async () => UserDB);
-
-    // Llamar al método del controlador
+    jest.spyOn(service, 'registerUser').mockImplementation(async () => UserDB);
     const result = await controller.register(UserCreateDto);
-
-    // Afirmaciones
     expect(result).toEqual(UserDB);
+  });
+
+  it('should login and return JWT token', async () => {
+    const userLoginDto: UserLoginDto = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+    jest.spyOn(controller, 'login').mockImplementation(() => {
+      return { access_token: 'mocked-access-token' };
+    });
+    const result = controller.login(userLoginDto, { user: {} });
+    expect(result).toEqual({ access_token: 'mocked-access-token' });
   });
 });

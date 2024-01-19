@@ -7,6 +7,22 @@ import { AppModule } from 'src/app.module';
 import { User } from '../user.schema';
 import { UserCreateDto } from '../user.dto';
 
+const user1: UserCreateDto = {
+  email: 'test1@example.com',
+  password: 'password1123',
+  nickName: 'testUser1',
+  img: 'avatar.jpg',
+  admin: true,
+};
+
+const user2: UserCreateDto = {
+  email: 'test2@example.com',
+  password: 'password2123',
+  nickName: 'testUser2',
+  img: 'avatar.jpg',
+  admin: true,
+};
+
 describe('UsersController (E2E)', () => {
   let app: INestApplication;
   let userModel: Model<User>;
@@ -15,55 +31,73 @@ describe('UsersController (E2E)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-
     app = moduleFixture.createNestApplication();
     userModel = app.get<Model<User>>(getModelToken(User.name));
     await app.init();
   });
 
-  beforeEach(async () => {
-    await userModel.deleteMany({});
-  });
-
   it('/users (POST) - Create a new user', async () => {
-    const userCreateDto: UserCreateDto = {
-      email: 'test@example.com',
-      password: 'password123',
-      nickName: 'testUser',
-      img: 'avatar.jpg',
-      admin: true,
-    };
     const response = await request(app.getHttpServer())
       .post('/users')
-      .send(userCreateDto)
+      .send(user1)
       .expect(201);
     expect(response.body).toHaveProperty('id');
     expect(typeof response.body.id).toBe('string');
     expect(response.body).toEqual(
       expect.objectContaining({
-        email: 'test@example.com',
-        nickName: 'testUser',
-        img: 'avatar.jpg',
+        email: user1.email,
+        nickName: user1.nickName,
+        img: user1.img,
         admin: false,
       }),
     );
-
-    //-------------
-    const userFromDB = await userModel.findOne({ email: 'test@example.com' });
-
-    expect(userFromDB).toBeDefined();
-    expect(userFromDB.email).toBe('test@example.com');
-    //-------------
-
+    //---------------
+    expect(await userModel.findOne({ email: user1.email })).toBeDefined();
+    //---------------
     const response2 = await request(app.getHttpServer())
       .post('/users')
-      .send(userCreateDto)
+      .send(user1)
       .expect(409);
     expect(response2.body).toHaveProperty(
       'message',
-      'E11000 duplicate key error collection: blogTest.users index: email_1 dup key: { email: "test@example.com" }',
+      `E11000 duplicate key error collection: blogTest.users index: email_1 dup key: { email: "${user1.email}" }`,
     );
     expect(response2.body).toHaveProperty('name', 'MongoServerError');
+  });
+
+  it('/users/login (POST) - Obtain JWT when logging in with correct credentials', async () => {
+    let response: any;
+    // Función auxiliar para realizar solicitudes de inicio de sesión y realizar afirmaciones
+    const assertLogin = async (user: object, expectedStatusCode: number) =>
+      await request(app.getHttpServer())
+        .post('/users/login')
+        .send(user)
+        .expect(expectedStatusCode);
+    // Caso de prueba: password incorrecto
+    response = await assertLogin(
+      { email: user1.email, password: 'incorrectPassword' },
+      401,
+    );
+    expect(response.body).toHaveProperty(
+      'message',
+      'Incorrect email or password',
+    );
+    // Caso de prueba: Email incorrecto
+    response = await assertLogin(
+      { email: 'incorrect@example.com', password: user1.password },
+      401,
+    );
+    expect(response.body).toHaveProperty(
+      'message',
+      'Incorrect email or password',
+    );
+    // Caso de prueba: Credenciales correctas
+    response = await assertLogin(
+      { email: user1.email, password: user1.password },
+      201,
+    );
+    expect(response.body).toHaveProperty('access_token');
+    expect(typeof response.body.access_token).toBe('string');
   });
 
   afterAll(async () => {
