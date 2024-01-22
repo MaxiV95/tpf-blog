@@ -148,7 +148,9 @@ volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example: Status **200**
@@ -177,7 +179,9 @@ volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example: Status **200**
@@ -203,7 +207,9 @@ volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
   ```typescript
@@ -236,7 +242,9 @@ volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example: Status **200**
@@ -258,7 +266,9 @@ Volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
   ```typescript
@@ -351,7 +361,9 @@ Volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
   ```typescript
@@ -390,7 +402,9 @@ Volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example: Status **200**
@@ -483,7 +497,9 @@ Volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example: Status **200**
@@ -507,7 +523,9 @@ Volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example: Status **200**
@@ -525,7 +543,9 @@ Volver al [Índice](#índice)
 - **Query**:
 - **header**:
   ```typescript
-  "bearer": string - required - token de acceso de usuario.
+  {
+    Authorization: `Bearer ${authToken}` (string - required - token de acceso de usuario.)
+  }
   ```
 - **Body**:
 - **Request Body** example - Status **200**:
