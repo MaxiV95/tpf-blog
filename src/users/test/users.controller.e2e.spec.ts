@@ -5,17 +5,18 @@ import { Model } from 'mongoose';
 import * as request from 'supertest';
 import { AppModule } from 'src/app.module';
 import { User } from '../user.schema';
-import { UserCreateDto } from '../user.dto';
 
-const user1: UserCreateDto = {
+const user1: any = {
   email: 'test1@example.com',
   password: 'password1123',
   nickName: 'testUser1',
   img: 'avatar.jpg',
   admin: true,
 };
+let id1: string;
+let authToken1: string;
 
-const user2: UserCreateDto = {
+const user2: any = {
   email: 'test2@example.com',
   password: 'password2123',
   nickName: 'testUser2',
@@ -43,6 +44,7 @@ describe('UsersController (E2E)', () => {
       .expect(201);
     expect(response.body).toHaveProperty('id');
     expect(typeof response.body.id).toBe('string');
+    id1 = response.body.id;
     expect(response.body).toEqual(
       expect.objectContaining({
         email: user1.email,
@@ -63,6 +65,15 @@ describe('UsersController (E2E)', () => {
       `E11000 duplicate key error collection: blogTest.users index: email_1 dup key: { email: "${user1.email}" }`,
     );
     expect(response2.body).toHaveProperty('name', 'MongoServerError');
+    //---------------
+    const response3 = await request(app.getHttpServer())
+      .post('/users')
+      .send(user2)
+      .expect(201);
+    expect(response3.body).toHaveProperty('id');
+    expect(typeof response3.body.id).toBe('string');
+    user2.id = response3.body.id;
+    expect(await userModel.findOne({ email: user2.email })).toBeDefined();
   });
 
   it('/users/login (POST) - Obtain JWT when logging in with correct credentials', async () => {
@@ -98,6 +109,28 @@ describe('UsersController (E2E)', () => {
     );
     expect(response.body).toHaveProperty('access_token');
     expect(typeof response.body.access_token).toBe('string');
+    authToken1 = response.body.access_token;
+  });
+
+  it('/users/:id (GET) - Get user by ID', async () => {
+    // Caso de prueba: sin enviar authToken
+    const response = await request(app.getHttpServer())
+      .get(`/users/${id1}`)
+      .expect(401);
+    expect(response.body).toHaveProperty('message', 'Unauthorized');
+    // Caso de prueba: enviando authToken
+    const response2 = await request(app.getHttpServer())
+      .get(`/users/${id1}`)
+      .set('Authorization', `Bearer ${authToken1}`)
+      .expect(200);
+    expect(response2.body).toEqual(
+      expect.objectContaining({
+        email: user1.email,
+        nickName: user1.nickName,
+        img: user1.img,
+        admin: false,
+      }),
+    );
   });
 
   afterAll(async () => {
