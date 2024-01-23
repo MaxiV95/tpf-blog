@@ -37,7 +37,7 @@ describe('UsersController (E2E)', () => {
     await app.init();
   });
 
-  it('/users (POST) - Create a new user', async () => {
+  it('(POST) /users - Create a new user', async () => {
     const response = await request(app.getHttpServer())
       .post('/users')
       .send(user1)
@@ -76,8 +76,7 @@ describe('UsersController (E2E)', () => {
     expect(await userModel.findOne({ email: user2.email })).toBeDefined();
   });
 
-  it('/users/login (POST) - Obtain JWT when logging in with correct credentials', async () => {
-    let response: any;
+  it('(POST) /users/login - Obtain JWT when logging in with correct credentials', async () => {
     // Función auxiliar para realizar solicitudes de inicio de sesión y realizar afirmaciones
     const assertLogin = async (user: object, expectedStatusCode: number) =>
       await request(app.getHttpServer())
@@ -85,7 +84,7 @@ describe('UsersController (E2E)', () => {
         .send(user)
         .expect(expectedStatusCode);
     // Caso de prueba: password incorrecto
-    response = await assertLogin(
+    const response = await assertLogin(
       { email: user1.email, password: 'incorrectPassword' },
       401,
     );
@@ -94,25 +93,25 @@ describe('UsersController (E2E)', () => {
       'Incorrect email or password',
     );
     // Caso de prueba: Email incorrecto
-    response = await assertLogin(
+    const response2 = await assertLogin(
       { email: 'incorrect@example.com', password: user1.password },
       401,
     );
-    expect(response.body).toHaveProperty(
+    expect(response2.body).toHaveProperty(
       'message',
       'Incorrect email or password',
     );
     // Caso de prueba: Credenciales correctas
-    response = await assertLogin(
+    const response3 = await assertLogin(
       { email: user1.email, password: user1.password },
       201,
     );
-    expect(response.body).toHaveProperty('access_token');
-    expect(typeof response.body.access_token).toBe('string');
-    authToken1 = response.body.access_token;
+    expect(response3.body).toHaveProperty('access_token');
+    expect(typeof response3.body.access_token).toBe('string');
+    authToken1 = response3.body.access_token;
   });
 
-  it('/users/:id (GET) - Get user by ID', async () => {
+  it('(GET)  /users/:id - Get user by ID', async () => {
     // Caso de prueba: sin enviar authToken
     const response = await request(app.getHttpServer())
       .get(`/users/${id1}`)
@@ -131,6 +130,36 @@ describe('UsersController (E2E)', () => {
         admin: false,
       }),
     );
+  });
+
+  it('(GET)  /users - Return all users for admin', async () => {
+    // Caso de prueba: sin enviar authToken
+    const response = await request(app.getHttpServer())
+      .get('/users')
+      .expect(401);
+    expect(response.body).toHaveProperty('message', 'Unauthorized');
+    // Caso de prueba: enviando authToken sin ser admin
+    const response2 = await request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', `Bearer ${authToken1}`)
+      .expect(401);
+    expect(response2.body).toHaveProperty(
+      'message',
+      'Unauthorized admin access',
+    );
+    // Caso de prueba: enviando authToken siendo admin
+    await userModel.updateOne({ _id: id1 }, { $set: { admin: true } });
+    const response3 = await request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', `Bearer ${authToken1}`)
+      .expect(200);
+    expect(response3.body).toBeInstanceOf(Array);
+    const firstUser = response3.body[0];
+    expect(firstUser).toHaveProperty('id');
+    expect(firstUser).toHaveProperty('email');
+    expect(firstUser).toHaveProperty('nickName');
+    expect(firstUser).toHaveProperty('img');
+    expect(firstUser).toHaveProperty('admin');
   });
 
   afterAll(async () => {
