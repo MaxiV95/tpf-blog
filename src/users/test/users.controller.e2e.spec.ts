@@ -23,6 +23,8 @@ const user2: any = {
   img: 'avatar.jpg',
   admin: true,
 };
+let id2: string;
+let authToken2: string;
 
 describe('UsersController (E2E)', () => {
   let app: INestApplication;
@@ -72,7 +74,7 @@ describe('UsersController (E2E)', () => {
       .expect(201);
     expect(response3.body).toHaveProperty('id');
     expect(typeof response3.body.id).toBe('string');
-    user2.id = response3.body.id;
+    id2 = response3.body.id;
     expect(await userModel.findOne({ email: user2.email })).toBeDefined();
   });
 
@@ -109,6 +111,11 @@ describe('UsersController (E2E)', () => {
     expect(response3.body).toHaveProperty('access_token');
     expect(typeof response3.body.access_token).toBe('string');
     authToken1 = response3.body.access_token;
+    const response4 = await assertLogin(
+      { email: user2.email, password: user2.password },
+      201,
+    );
+    authToken2 = response4.body.access_token;
   });
 
   it('(GET)  /users/:id - Get user by ID', async () => {
@@ -160,6 +167,53 @@ describe('UsersController (E2E)', () => {
     expect(firstUser).toHaveProperty('nickName');
     expect(firstUser).toHaveProperty('img');
     expect(firstUser).toHaveProperty('admin');
+  });
+
+  it('(PUT)  /users/:id - Updating own user data', async () => {
+    const updateData = {
+      id: '6570bb7db2ad523394706c12',
+      email: 'updatedTest1@example.com',
+      nickName: 'updatedNickname',
+      img: 'updatedAvatar.jpg',
+      admin: true,
+    };
+    // Caso de prueba: intentar actualizar otra cuenta sin ser admin
+    const response = await request(app.getHttpServer())
+      .put(`/users/${id1}`)
+      .set('Authorization', `Bearer ${authToken2}`)
+      .send(updateData)
+      .expect(401);
+    expect(response.body).toHaveProperty(
+      'message',
+      'Insufficient privileges for this operation',
+    );
+    // Caso de prueba: intentar actualizar propia cuenta sin ser admin
+    const response2 = await request(app.getHttpServer())
+      .put(`/users/${id2}`)
+      .set('Authorization', `Bearer ${authToken2}`)
+      .send(updateData)
+      .expect(200);
+    expect(response2.body).toEqual(
+      expect.objectContaining({
+        id: id2,
+        email: user2.email,
+        nickName: updateData.nickName,
+        img: updateData.img,
+        admin: false,
+      }),
+    );
+    // Caso de prueba: intentar actualizar otra cuenta siendo admin
+    const response3 = await request(app.getHttpServer())
+      .put(`/users/${id2}`)
+      .set('Authorization', `Bearer ${authToken1}`)
+      .send({ admin: true })
+      .expect(200);
+    expect(response3.body).toEqual(
+      expect.objectContaining({
+        admin: true,
+      }),
+    );
+    await userModel.updateOne({ _id: id2 }, { $set: { admin: false } });
   });
 
   afterAll(async () => {
