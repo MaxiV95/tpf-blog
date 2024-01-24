@@ -58,6 +58,7 @@ export class UsersService {
       await this.userModel.findByIdAndUpdate(
         { _id: id },
         { $set: updateFields },
+        { new: true },
       )
     ).toJSON();
   }
