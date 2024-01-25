@@ -177,7 +177,7 @@ describe('UsersController (E2E)', () => {
       img: 'updatedAvatar.jpg',
       admin: true,
     };
-    // Caso de prueba: intentar actualizar otra cuenta sin ser admin
+    // Caso de prueba: actualizar otra cuenta sin ser admin
     const response = await request(app.getHttpServer())
       .put(`/users/${id1}`)
       .set('Authorization', `Bearer ${authToken2}`)
@@ -187,7 +187,7 @@ describe('UsersController (E2E)', () => {
       'message',
       'Insufficient privileges for this operation',
     );
-    // Caso de prueba: intentar actualizar propia cuenta sin ser admin
+    // Caso de prueba: actualizar propia cuenta sin ser admin
     const response2 = await request(app.getHttpServer())
       .put(`/users/${id2}`)
       .set('Authorization', `Bearer ${authToken2}`)
@@ -202,7 +202,7 @@ describe('UsersController (E2E)', () => {
         admin: false,
       }),
     );
-    // Caso de prueba: intentar actualizar otra cuenta siendo admin
+    // Caso de prueba: actualizar otra cuenta siendo admin
     const response3 = await request(app.getHttpServer())
       .put(`/users/${id2}`)
       .set('Authorization', `Bearer ${authToken1}`)
@@ -214,6 +214,36 @@ describe('UsersController (E2E)', () => {
       }),
     );
     await userModel.updateOne({ _id: id2 }, { $set: { admin: false } });
+  });
+
+  it('(DELETE) /users/:id - Delete user', async () => {
+    // Caso de prueba: eliminar otra cuenta sin ser admin
+    const response = await request(app.getHttpServer())
+      .delete(`/users/${id1}`)
+      .set('Authorization', `Bearer ${authToken2}`)
+      .expect(401);
+    expect(response.body).toHaveProperty(
+      'message',
+      'Unauthorized admin access',
+    );
+    // Caso de prueba: eliminar propia cuenta sin ser admin
+    const response2 = await request(app.getHttpServer())
+      .delete(`/users/${id2}`)
+      .set('Authorization', `Bearer ${authToken2}`)
+      .expect(401);
+    expect(response2.body).toHaveProperty(
+      'message',
+      'Unauthorized admin access',
+    );
+    // Caso de prueba: eliminar otra cuenta siendo admin
+    const response3 = await request(app.getHttpServer())
+      .delete(`/users/${id2}`)
+      .set('Authorization', `Bearer ${authToken1}`) // Admin user's token
+      .expect(200);
+    expect(response3.body).toEqual({
+      acknowledged: true,
+      deletedCount: 1,
+    });
   });
 
   afterAll(async () => {
