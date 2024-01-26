@@ -30,7 +30,9 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('users')
-  @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
+  @ApiOperation({
+    summary: 'ADMIN Obtener todos los usuarios con opción de moderación.',
+  })
   @ApiResponse({
     status: 200,
     description: 'Retorna todos los usuarios.',
@@ -43,7 +45,7 @@ export class AdminController {
   }
 
   @Delete('users/:id')
-  @ApiOperation({ summary: 'ADMIN Eliminar usuario' })
+  @ApiOperation({ summary: 'ADMIN Eliminar usuario.' })
   @ApiResponse({
     status: 200,
     description: 'Confirma usuario eliminado.',
@@ -68,7 +70,7 @@ export class AdminController {
   @ApiBearerAuth()
   @ApiOperation({
     summary:
-      'Obtener todos los posts con opciones de moderación (borrar o editar)',
+      'Obtener todos los posts con opciones de moderación (borrar o editar).',
   })
   @ApiResponse({
     status: 200,
