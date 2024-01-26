@@ -38,15 +38,15 @@ import { User } from 'src/auth/custom.decorator.ts';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get() // admin
+  @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'ADMIN Obtener todos los usuarios' })
+  @ApiOperation({ summary: 'Obtener todos los usuarios' })
   @ApiResponse({
     status: 200,
     description: 'Retorna todos los usuarios.',
     type: [UserDB],
   })
-  @UseGuards(JwtAuthGuard, adminGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   async getAllUsers(): Promise<UserDB[]> {
     return await this.usersService.getAllUsers();
