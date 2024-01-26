@@ -84,7 +84,7 @@ Asegúrate de tener instalados los siguientes requisitos antes de ejecutar la ap
   npm test:e2e
   ```
 
-La aplicación estará disponible en http://localhost:3001.  
+La aplicación estará disponible en http://localhost:3001
 La documentación de la API estará disponible en http://localhost:3001/docs
 
 Volver al [Índice](#índice)
@@ -216,7 +216,7 @@ volver al [Índice](#índice)
   {
     "nickName": string - optional - Nombre de usuario.
     "img": string - optional - Enlace de la imagen del usuario.
-    "admin": boolean - optional - Restringido a administradores
+    "admin": boolean - optional - Restringido a administradores.
   }
   ```
 - **Request Body** example: Status **200**
@@ -441,7 +441,7 @@ Volver al [Índice](#índice)
 
 Volver al [Índice](#índice)
 
-- **`GET /posts/search`** - Buscar posts por título, contenido, etc. Debe admitir parámetros para paginar resultados (el default de resultados si no hay param será 10)
+- **`GET /posts/search`** - Buscar posts por título, contenido, etc. Debe admitir parámetros para paginar resultados (el default de resultados si no hay param será 10).
 - **Params**:
 - **Query**:
   ```typescript
@@ -465,7 +465,7 @@ Volver al [Índice](#índice)
 
 Volver al [Índice](#índice)
 
-- **`GET /posts/filter`** - Endpoints adicionales para filtrar posts por categoría o autor
+- **`GET /posts/filter`** - Endpoints adicionales para filtrar posts por categoría o autor.
 - **Params**:
 - **Query**:
   ```typescript
@@ -492,7 +492,7 @@ Volver al [Índice](#índice)
 
 ### **Administración**
 
-- **`GET /admin/users`** - (restringido a administradores) Obtener todos los usuarios.
+- **`GET /admin/users`** - (restringido a administradores) Obtener todos los usuarios con opción de moderación.
 - **Params**:
 - **Query**:
 - **header**:
@@ -538,7 +538,7 @@ Volver al [Índice](#índice)
 
 Volver al [Índice](#índice)
 
-- **`GET /admin/posts`** - Obtener todos los posts con opciones de moderación (borrar o editar) .
+- **`GET /admin/posts`** - Obtener todos los posts con opciones de moderación (borrar o editar).
 - **Params**:
 - **Query**:
 - **header**:
