@@ -145,23 +145,13 @@ describe('UsersController (E2E)', () => {
       .get('/users')
       .expect(401);
     expect(response.body).toHaveProperty('message', 'Unauthorized');
-    // Caso de prueba: enviando authToken sin ser admin
+    // Caso de prueba: enviando authToken
     const response2 = await request(app.getHttpServer())
       .get('/users')
       .set('Authorization', `Bearer ${authToken1}`)
-      .expect(401);
-    expect(response2.body).toHaveProperty(
-      'message',
-      'Unauthorized admin access',
-    );
-    // Caso de prueba: enviando authToken siendo admin
-    await userModel.updateOne({ _id: id1 }, { $set: { admin: true } });
-    const response3 = await request(app.getHttpServer())
-      .get('/users')
-      .set('Authorization', `Bearer ${authToken1}`)
       .expect(200);
-    expect(response3.body).toBeInstanceOf(Array);
-    const firstUser = response3.body[0];
+    expect(response2.body).toBeInstanceOf(Array);
+    const firstUser = response2.body[0];
     expect(firstUser).toHaveProperty('id');
     expect(firstUser).toHaveProperty('email');
     expect(firstUser).toHaveProperty('nickName');
@@ -203,6 +193,7 @@ describe('UsersController (E2E)', () => {
       }),
     );
     // Caso de prueba: actualizar otra cuenta siendo admin
+    await userModel.updateOne({ _id: id1 }, { $set: { admin: true } });
     const response3 = await request(app.getHttpServer())
       .put(`/users/${id2}`)
       .set('Authorization', `Bearer ${authToken1}`)
